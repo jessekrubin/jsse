@@ -1,6 +1,6 @@
 {
   "name": "jsse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "jesse js",
   "main": "./lib/index.js",
   "scripts": {
@@ -30,7 +30,6 @@
   },
   "homepage": "https://github.com/jessekrubin/jsse#readme",
   "devDependencies": {
-    "typescript": "^3.4.5",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^10.0.1",
     "babel-plugin-add-module-exports": "^1.0.0",
@@ -46,6 +45,7 @@
     "eslint-plugin-react": "^7.4.0",
     "mocha": "^6.1.3",
     "nyc": "^13.3.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "typescript": "^3.4.5"
   }
 }
