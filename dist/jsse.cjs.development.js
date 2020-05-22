@@ -110,7 +110,6 @@ var http = function http(request) {
 
       var _temp = _catch(function () {
         // may error if there is no body or if it can't be parsed
-        // response.bodyJSON = await response.json();
         return Promise.resolve(response.json()).then(function (_response$json) {
           response.bodyJSON = _response$json;
         });
@@ -121,14 +120,6 @@ var http = function http(request) {
   } catch (e) {
     return Promise.reject(e);
   }
-};
-
-var fetching = {
-  __proto__: null,
-  put: put,
-  post: post,
-  get: get,
-  http: http
 };
 
 global.Buffer = global.Buffer || /*#__PURE__*/require('buffer').Buffer;
@@ -147,6 +138,7 @@ if (typeof atob === 'undefined') {
   global.atob = b64decode;
 }
 
+var _marked = /*#__PURE__*/regeneratorRuntime.mark(range);
 var sum = function sum(a, b) {
   {
     console.log('boop');
@@ -178,6 +170,12 @@ var filter_vals = function filter_vals(obj, vals) {
     return r;
   }, {});
 };
+var filter_falsey_vals = function filter_falsey_vals(obj) {
+  return Object.keys(obj).reduce(function (r, e) {
+    if (obj[e]) r[e] = obj[e];
+    return r;
+  }, {});
+};
 var zip = function zip(arr) {
   for (var _len = arguments.length, arrs = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     arrs[_key - 1] = arguments[_key];
@@ -197,15 +195,57 @@ var objectify = function objectify(arr, key) {
     return Object.assign(obj, (_Object$assign = {}, _Object$assign[item[key]] = item, _Object$assign));
   }, {});
 };
-var range = function range(end, start) {
-  if (start === void 0) {
-    start = 0;
+function range(start, end, step) {
+  var _ref, n;
+
+  return regeneratorRuntime.wrap(function range$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          if (step === void 0) {
+            step = 1;
+          }
+
+          if (end === undefined) {
+            _ref = [start, 0];
+            end = _ref[0];
+            start = _ref[1];
+          }
+
+          n = start;
+
+        case 3:
+          if (!(n < end)) {
+            _context.next = 9;
+            break;
+          }
+
+          _context.next = 6;
+          return n;
+
+        case 6:
+          n += step;
+          _context.next = 3;
+          break;
+
+        case 9:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, _marked);
+}
+function arange(start, end, step) {
+  if (end === void 0) {
+    end = undefined;
   }
 
-  return new Array(end - start).fill(undefined).map(function (_, i) {
-    return i + start;
-  });
-};
+  if (step === void 0) {
+    step = 1;
+  }
+
+  return Array.from(range(start, end, step));
+}
 function arrmin(arr) {
   return arr.reduce(function (p, v) {
     return p < v ? p : v;
@@ -217,16 +257,21 @@ function arrmax(arr) {
   });
 }
 
+exports.arange = arange;
 exports.arrmax = arrmax;
 exports.arrmin = arrmin;
 exports.b64decode = b64decode;
 exports.b64encode = b64encode;
-exports.fetching = fetching;
+exports.filter_falsey_vals = filter_falsey_vals;
 exports.filter_keys = filter_keys;
 exports.filter_vals = filter_vals;
+exports.get = get;
+exports.http = http;
 exports.keep_keys = keep_keys;
 exports.keep_vals = keep_vals;
 exports.objectify = objectify;
+exports.post = post;
+exports.put = put;
 exports.range = range;
 exports.sum = sum;
 exports.zip = zip;
