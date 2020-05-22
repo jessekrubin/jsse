@@ -134,7 +134,6 @@ if (typeof atob === 'undefined') {
   global.atob = b64decode;
 }
 
-var _marked = /*#__PURE__*/regeneratorRuntime.mark(range);
 var sum = function sum(a, b) {
   if ('development' === process.env.NODE_ENV) {
     console.log('boop');
@@ -190,47 +189,11 @@ var objectify = function objectify(arr, key) {
 
     return Object.assign(obj, (_Object$assign = {}, _Object$assign[item[key]] = item, _Object$assign));
   }, {});
-};
-function range(start, end, step) {
-  var _ref, n;
+}; // export function* range(start: number, end: number | undefined, step = 1) {
+//   if (end === undefined) [end, start] = [start, 0];
+//   for (let n = start; n < end; n += step) yield n;
+// }
 
-  return regeneratorRuntime.wrap(function range$(_context) {
-    while (1) {
-      switch (_context.prev = _context.next) {
-        case 0:
-          if (step === void 0) {
-            step = 1;
-          }
-
-          if (end === undefined) {
-            _ref = [start, 0];
-            end = _ref[0];
-            start = _ref[1];
-          }
-
-          n = start;
-
-        case 3:
-          if (!(n < end)) {
-            _context.next = 9;
-            break;
-          }
-
-          _context.next = 6;
-          return n;
-
-        case 6:
-          n += step;
-          _context.next = 3;
-          break;
-
-        case 9:
-        case "end":
-          return _context.stop();
-      }
-    }
-  }, _marked);
-}
 function arange(start, end, step) {
   if (end === void 0) {
     end = undefined;
@@ -240,7 +203,19 @@ function arange(start, end, step) {
     step = 1;
   }
 
-  return Array.from(range(start, end, step));
+  if (end === undefined) {
+    var _ref = [start, 0];
+    end = _ref[0];
+    start = _ref[1];
+  }
+
+  var l = [];
+
+  for (var n = start; n < end; n += step) {
+    l.push(n);
+  }
+
+  return l;
 }
 function arrmin(arr) {
   return arr.reduce(function (p, v) {
@@ -253,5 +228,5 @@ function arrmax(arr) {
   });
 }
 
-export { arange, arrmax, arrmin, b64decode, b64encode, filter_falsey_vals, filter_keys, filter_vals, get, http, keep_keys, keep_vals, objectify, post, put, range, sum, zip };
+export { arange, arrmax, arrmin, b64decode, b64encode, filter_falsey_vals, filter_keys, filter_vals, get, http, keep_keys, keep_vals, objectify, post, put, sum, zip };
 //# sourceMappingURL=jsse.esm.js.map

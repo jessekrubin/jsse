@@ -8,7 +8,6 @@ export declare const filter_vals: (obj: any, vals: any[]) => Record<string, any>
 export declare const filter_falsey_vals: (obj: any) => Record<any, any>;
 export declare const zip: (arr: any[], ...arrs: any[]) => any[];
 export declare const objectify: (arr: any[], key: string | number) => any;
-export declare function range(start: number, end: number | undefined, step?: number): Generator<number, void, unknown>;
 export declare function arange(start: number, end?: number | undefined, step?: number): number[];
 export declare function arrmin<T>(arr: T[]): T;
 export declare function arrmax<T>(arr: T[]): T;

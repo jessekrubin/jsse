@@ -54,17 +54,20 @@ export const objectify = (arr: any[], key: string | number) => {
   }, {});
 };
 
-export function* range(start: number, end: number | undefined, step = 1) {
-  if (end === undefined) [end, start] = [start, 0];
-  for (let n = start; n < end; n += step) yield n;
-}
+// export function* range(start: number, end: number | undefined, step = 1) {
+//   if (end === undefined) [end, start] = [start, 0];
+//   for (let n = start; n < end; n += step) yield n;
+// }
 
 export function arange(
   start: number,
   end: number | undefined = undefined,
   step = 1
 ): number[] {
-  return Array.from(range(start, end, step));
+  if (end === undefined) [end, start] = [start, 0];
+  let l = []
+  for (let n = start; n < end; n += step) l.push(n);
+  return l
 }
 
 export function arrmin<T>(arr: T[]): T {
