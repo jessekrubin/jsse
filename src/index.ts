@@ -1,3 +1,6 @@
+export * from './fetching';
+export * from './b64';
+
 export const sum = (a: number, b: number) => {
   if ('development' === process.env.NODE_ENV) {
     console.log('boop');
@@ -33,6 +36,13 @@ export const filter_vals = (obj: any, vals: any[]) => {
   }, {});
 };
 
+export const filter_falsey_vals = (obj: any) => {
+  return Object.keys(obj).reduce(function(r: Record<any, any>, e) {
+    if (obj[e]) r[e] = obj[e];
+    return r;
+  }, {});
+};
+
 export const zip = (arr: any[], ...arrs: any[]) => {
   return arr.map((val, i) => arrs.reduce((a, arr) => [...a, arr[i]], [val]));
 };
@@ -43,3 +53,28 @@ export const objectify = (arr: any[], key: string | number) => {
     return Object.assign(obj, { [item[key]]: item });
   }, {});
 };
+
+export function* range(start: number, end: number | undefined, step = 1) {
+  if (end === undefined) [end, start] = [start, 0];
+  for (let n = start; n < end; n += step) yield n;
+}
+
+export function arange(
+  start: number,
+  end: number | undefined = undefined,
+  step = 1
+): number[] {
+  return Array.from(range(start, end, step));
+}
+
+export function arrmin<T>(arr: T[]): T {
+  return arr.reduce(function(p, v) {
+    return p < v ? p : v;
+  });
+}
+
+export function arrmax<T>(arr: T[]): T {
+  return arr.reduce(function(p, v) {
+    return p > v ? p : v;
+  });
+}

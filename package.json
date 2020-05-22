@@ -14,8 +14,8 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
-    "lint": "tsdx lint",
-    "fmt": "tsdx lint --fix",
+    "lint": "tsdx lint src test",
+    "fmt": "tsdx lint --fix src test",
     "prepare": "tsdx build"
   },
   "peerDependencies": {},
@@ -25,7 +25,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint"
+      "pre-commit": "tsdx lint --fix src test"
     }
   },
   "bugs": {
