@@ -1,5 +1,6 @@
 import {
   arange,
+  chunk,
   arrmax,
   arrmin,
   ljson,
@@ -54,5 +55,11 @@ describe('fs-utils', () => {
     await sjson(filepath, anobject);
     const loaded_stringy = await ljson(filepath);
     return expect(loaded_stringy).toEqual(anobject);
+  });
+});
+
+describe('chunks', () => {
+  it('chunk', () => {
+    return expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
   });
 });

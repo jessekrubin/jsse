@@ -1,10 +1,14 @@
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export const sum = (a: number, b: number) => {
   if ('development' === process.env.NODE_ENV) {
     console.log('boop');
   }
   return a + b;
 };
-export const keep_keys = (obj: any, keys: string[]) => {
+export const keep_keys = (obj: Record<any, any>, keys: string[]) => {
   return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
     if (keys.includes(e)) r[e] = obj[e];
     return r;
@@ -24,14 +28,14 @@ export const filter_keys = (obj: Record<any, any>, keys: string[]) => {
   }, {});
 };
 
-export const filter_vals = (obj: any, vals: any[]) => {
+export const filter_vals = (obj: Record<any, any>, vals: any[]) => {
   return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
     if (!vals.includes(obj[e])) r[e] = obj[e];
     return r;
   }, {});
 };
 
-export const filter_falsey_vals = (obj: any) => {
+export const filter_falsey_vals = (obj: Record<any, any>) => {
   return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
     if (obj[e]) r[e] = obj[e];
     return r;
@@ -75,4 +79,10 @@ export function arrmax<T>(arr: T[]): T {
   return arr.reduce(function (p, v) {
     return p > v ? p : v;
   });
+}
+
+export function chunk<T>(arr: T[], size: number): T[][] {
+  return Array.from({length: Math.ceil(arr.length / size)}, (_v, i) =>
+    arr.slice(i * size, i * size + size),
+  );
 }
