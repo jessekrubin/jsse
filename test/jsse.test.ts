@@ -40,7 +40,6 @@ describe('arrmax arrmin', () => {
 });
 
 describe('fs-utils', () => {
-
   it('STRING-IO TEST: sstring and lstring', async () => {
     const stringy = 'this is a string\nand it has two lines';
     const filepath = 'somefile.txt';
@@ -50,7 +49,7 @@ describe('fs-utils', () => {
   });
 
   it('JSON-IO TEST DICT: sjson and ljson', async () => {
-    const anobject = {one: 1, two: 2, three: 3};
+    const anobject = { one: 1, two: 2, three: 3 };
     const filepath = 'somefile.txt';
     await sjson(filepath, anobject);
     const loaded_stringy = await ljson(filepath);
