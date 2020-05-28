@@ -582,11 +582,7 @@ var sort_keys_replacer = function sort_keys_replacer(_key, value) {
     sorted[key] = value[key];
     return sorted;
   }, {}) : value;
-}; // console.log(JSON.stringify({
-//   c: 1,
-//   a: {d: 0, c: 1, e: {a: 0, 1: 4}},
-// }, sort_keys_replacer));
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+}; // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 var sjson = function sjson(filepath, data, sort_keys, indent) {
   if (sort_keys === void 0) {
@@ -598,8 +594,9 @@ var sjson = function sjson(filepath, data, sort_keys, indent) {
   }
 
   try {
-    var replacer = sort_keys && typeof data === 'object' ? Object.keys(data).sort() : null;
-    return Promise.resolve(sstring(filepath, JSON.stringify(data, replacer, indent))).then(function () {});
+    var replacer = sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
+    return Promise.resolve(sstring(filepath, JSON.stringify(data, // @ts-ignore
+    replacer, indent))).then(function () {});
   } catch (e) {
     return Promise.reject(e);
   }

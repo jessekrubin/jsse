@@ -57,7 +57,6 @@ export const objectify = (arr: any[], key: string | number) => {
 //   if (end === undefined) [end, start] = [start, 0];
 //   for (let n = start; n < end; n += step) yield n;
 // }
-
 export function arange(
   start: number,
   end: number | undefined = undefined,
@@ -68,6 +67,11 @@ export function arange(
   for (let n = start; n < end; n += step) l.push(n);
   return l;
 }
+
+
+export const items = (obj: any) => {
+  return Object.entries(obj);
+};
 
 export function arrmin<T>(arr: T[]): T {
   return arr.reduce(function (p, v) {
@@ -81,8 +85,10 @@ export function arrmax<T>(arr: T[]): T {
   });
 }
 
-export function chunk<T>(arr: T[], size: number): T[][] {
-  return Array.from({length: Math.ceil(arr.length / size)}, (_v, i) =>
-    arr.slice(i * size, i * size + size),
-  );
-}
+export const chunk = (array: any[], size: number) => {
+  return array.reduce((arr: any[], item, idx: number) => {
+    return idx % size === 0
+      ? [...arr, [item]]
+      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
+  }, []);
+};

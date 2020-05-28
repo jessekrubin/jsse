@@ -23,7 +23,7 @@ export function objkeys<O extends object>(obj: O): Array<keyof O> {
   return Object.keys(obj) as Array<keyof O>;
 }
 
-export const sort_keys_replacer = (_key: any, value: { [x: string]: any; }) =>
+export const sort_keys_replacer = (_key: any, value: { [x: string]: any; } | any[] | any) =>
   value instanceof Object && !(value instanceof Array) ?
     Object.keys(value)
       .sort()
