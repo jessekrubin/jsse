@@ -1,11 +1,12 @@
 import {
   arange,
-  chunk,
   arrmax,
   arrmin,
+  chunk,
   ljson,
   lstring,
   sjson,
+  sort_keys_replacer,
   sstring,
   sum,
 } from '../src';
@@ -63,3 +64,23 @@ describe('chunks', () => {
     return expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
   });
 });
+describe('stringify', () => {
+  it('sorted', () => {
+    const input_obj = {
+      c: 1,
+      a: { d: 0, c: 1, e: { a: 0, 1: 4 } },
+    };
+    const exp = '{"a":{"c":1,"d":0,"e":{"1":4,"a":0}},"c":1}';
+    const sorted_str = JSON.stringify(input_obj, sort_keys_replacer);
+    // console.log(
+    //   input_obj,
+    //   sorted_str,
+    //   exp,
+    // );
+    return expect(sorted_str).toEqual(exp);
+  });
+});
+// console.log(JSON.stringify({
+//   c: 1,
+//   a: {d: 0, c: 1, e: {a: 0, 1: 4}},
+// }, sort_keys_replacer));

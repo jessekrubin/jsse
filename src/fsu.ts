@@ -1,28 +1,47 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
 import {promises as fs} from 'fs';
 
 import path from 'path';
-// This must run inside a function marked `async`:
 
 export const lstring = async (filepath: string, encoding = 'utf8'): Promise<string> => {
   // @ts-ignore
   return String(await fs.readFile(filepath, encoding));
 };
 
+
 export const sstring = async (filepath: string, str: string) => {
   await fs.writeFile(filepath, str);
 };
+
+export const lstr = lstring;
+export const sstr = sstring;
 
 export const ljson = async (filepath: string): Promise<JSON> => {
   return JSON.parse(await lstring(filepath));
 };
 
+export function objkeys<O extends object>(obj: O): Array<keyof O> {
+  return Object.keys(obj) as Array<keyof O>;
+}
+
+export const sort_keys_replacer = (_key: any, value: { [x: string]: any; }) =>
+  value instanceof Object && !(value instanceof Array) ?
+    Object.keys(value)
+      .sort()
+      .reduce((sorted, key: string) => {
+        sorted[key] = value[key];
+        return sorted;
+      }, {}) :
+    value;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sjson = async (filepath: string, data: any, sort_keys: boolean = false, indent: number | undefined = undefined) => {
-  const replacer = (sort_keys && typeof data === 'object') ? Object.keys(data)
-    .sort() : null;
-  await sstring(filepath, JSON.stringify(data, replacer, indent));
+  const replacer = (sort_keys && typeof data === 'object') ? sort_keys_replacer : null;
+  await sstring(filepath, JSON.stringify(
+    data,
+    // @ts-ignore
+    replacer,
+    indent,
+  ));
 };
 
 export const mkdir = async (dirpath: string, exist_ok = false) => {
@@ -150,8 +169,4 @@ export const walk_list = async (dirpath: string) => {
     arr.push(el);
   }
   return arr;
-};
-
-export const range = (end: number, start = 0): number[] => {
-  return new Array(end - start).fill(undefined).map((_, i) => i + start);
 };

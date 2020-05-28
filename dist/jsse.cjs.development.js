@@ -439,6 +439,11 @@ if (typeof atob === 'undefined') {
   global.atob = b64decode;
 }
 
+function sleep(ms) {
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, ms);
+  });
+}
 var sum = function sum(a, b) {
   {
     console.log('boop');
@@ -532,6 +537,13 @@ function arrmax(arr) {
     return p > v ? p : v;
   });
 }
+function chunk(arr, size) {
+  return Array.from({
+    length: Math.ceil(arr.length / size)
+  }, function (_v, i) {
+    return arr.slice(i * size, i * size + size);
+  });
+}
 
 var lstring = function lstring(filepath, encoding) {
   if (encoding === void 0) {
@@ -553,13 +565,28 @@ var sstring = function sstring(filepath, str) {
     return Promise.reject(e);
   }
 };
+var lstr = lstring;
+var sstr = sstring;
 var ljson = function ljson(filepath) {
   try {
     return Promise.resolve(lstring(filepath)).then(JSON.parse);
   } catch (e) {
     return Promise.reject(e);
   }
-}; // eslint-disable-next-line @typescript-eslint/no-explicit-any
+};
+function objkeys(obj) {
+  return Object.keys(obj);
+}
+var sort_keys_replacer = function sort_keys_replacer(_key, value) {
+  return value instanceof Object && !(value instanceof Array) ? Object.keys(value).sort().reduce(function (sorted, key) {
+    sorted[key] = value[key];
+    return sorted;
+  }, {}) : value;
+}; // console.log(JSON.stringify({
+//   c: 1,
+//   a: {d: 0, c: 1, e: {a: 0, 1: 4}},
+// }, sort_keys_replacer));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 var sjson = function sjson(filepath, data, sort_keys, indent) {
   if (sort_keys === void 0) {
@@ -973,21 +1000,13 @@ var walk_list = function walk_list(dirpath) {
     return Promise.reject(e);
   }
 };
-var range = function range(end, start) {
-  if (start === void 0) {
-    start = 0;
-  }
-
-  return new Array(end - start).fill(undefined).map(function (_, i) {
-    return i + start;
-  });
-};
 
 exports.arange = arange;
 exports.arrmax = arrmax;
 exports.arrmin = arrmin;
 exports.b64decode = b64decode;
 exports.b64encode = b64encode;
+exports.chunk = chunk;
 exports.cpfile = cpfile;
 exports.exists = exists;
 exports.fdtype = fdtype;
@@ -1002,14 +1021,18 @@ exports.keep_keys = keep_keys;
 exports.keep_vals = keep_vals;
 exports.ljson = ljson;
 exports.ls = ls;
+exports.lstr = lstr;
 exports.lstring = lstring;
 exports.mkdir = mkdir;
 exports.mv = mv;
 exports.objectify = objectify;
+exports.objkeys = objkeys;
 exports.post = post;
 exports.put = put;
-exports.range = range;
 exports.sjson = sjson;
+exports.sleep = sleep;
+exports.sort_keys_replacer = sort_keys_replacer;
+exports.sstr = sstr;
 exports.sstring = sstring;
 exports.sum = sum;
 exports.walk_gen = walk_gen;

@@ -433,6 +433,11 @@ if (typeof atob === 'undefined') {
   global.atob = b64decode;
 }
 
+function sleep(ms) {
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, ms);
+  });
+}
 var sum = function sum(a, b) {
   if ('development' === process.env.NODE_ENV) {
     console.log('boop');
@@ -526,6 +531,13 @@ function arrmax(arr) {
     return p > v ? p : v;
   });
 }
+function chunk(arr, size) {
+  return Array.from({
+    length: Math.ceil(arr.length / size)
+  }, function (_v, i) {
+    return arr.slice(i * size, i * size + size);
+  });
+}
 
 var lstring = function lstring(filepath, encoding) {
   if (encoding === void 0) {
@@ -547,13 +559,28 @@ var sstring = function sstring(filepath, str) {
     return Promise.reject(e);
   }
 };
+var lstr = lstring;
+var sstr = sstring;
 var ljson = function ljson(filepath) {
   try {
     return Promise.resolve(lstring(filepath)).then(JSON.parse);
   } catch (e) {
     return Promise.reject(e);
   }
-}; // eslint-disable-next-line @typescript-eslint/no-explicit-any
+};
+function objkeys(obj) {
+  return Object.keys(obj);
+}
+var sort_keys_replacer = function sort_keys_replacer(_key, value) {
+  return value instanceof Object && !(value instanceof Array) ? Object.keys(value).sort().reduce(function (sorted, key) {
+    sorted[key] = value[key];
+    return sorted;
+  }, {}) : value;
+}; // console.log(JSON.stringify({
+//   c: 1,
+//   a: {d: 0, c: 1, e: {a: 0, 1: 4}},
+// }, sort_keys_replacer));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 var sjson = function sjson(filepath, data, sort_keys, indent) {
   if (sort_keys === void 0) {
@@ -967,15 +994,6 @@ var walk_list = function walk_list(dirpath) {
     return Promise.reject(e);
   }
 };
-var range = function range(end, start) {
-  if (start === void 0) {
-    start = 0;
-  }
 
-  return new Array(end - start).fill(undefined).map(function (_, i) {
-    return i + start;
-  });
-};
-
-export { arange, arrmax, arrmin, b64decode, b64encode, cpfile, exists, fdtype, filter_falsey_vals, filter_keys, filter_vals, get, http, isfile, islink, keep_keys, keep_vals, ljson, ls, lstring, mkdir, mv, objectify, post, put, range, sjson, sstring, sum, walk_gen, walk_list, zip };
+export { arange, arrmax, arrmin, b64decode, b64encode, chunk, cpfile, exists, fdtype, filter_falsey_vals, filter_keys, filter_vals, get, http, isfile, islink, keep_keys, keep_vals, ljson, ls, lstr, lstring, mkdir, mv, objectify, objkeys, post, put, sjson, sleep, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
 //# sourceMappingURL=jsse.esm.js.map
