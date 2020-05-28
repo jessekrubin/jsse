@@ -92,3 +92,12 @@ export const chunk = (array: any[], size: number) => {
       : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
   }, []);
 };
+
+export function map_async<T, U>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<U>): Promise<U[]> {
+  return Promise.all(array.map(cb));
+}
+
+export async function filter_async<T>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<boolean>): Promise<T[]> {
+  const filterMap = await map_async(array, cb);
+  return array.filter((_value, index) => filterMap[index]);
+}

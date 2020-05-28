@@ -433,6 +433,17 @@ if (typeof atob === 'undefined') {
   global.atob = b64decode;
 }
 
+var filter_async = function filter_async(array, cb) {
+  try {
+    return Promise.resolve(map_async(array, cb)).then(function (filterMap) {
+      return array.filter(function (_value, index) {
+        return filterMap[index];
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
 function sleep(ms) {
   return new Promise(function (resolve) {
     return setTimeout(resolve, ms);
@@ -521,6 +532,9 @@ function arange(start, end, step) {
 
   return l;
 }
+var items = function items(obj) {
+  return Object.entries(obj);
+};
 function arrmin(arr) {
   return arr.reduce(function (p, v) {
     return p < v ? p : v;
@@ -531,13 +545,111 @@ function arrmax(arr) {
     return p > v ? p : v;
   });
 }
-function chunk(arr, size) {
-  return Array.from({
-    length: Math.ceil(arr.length / size)
-  }, function (_v, i) {
-    return arr.slice(i * size, i * size + size);
-  });
+var chunk = function chunk(array, size) {
+  return array.reduce(function (arr, item, idx) {
+    return idx % size === 0 ? [].concat(arr, [[item]]) : [].concat(arr.slice(0, -1), [[].concat(arr.slice(-1)[0], [item])]);
+  }, []);
+};
+function map_async(array, cb) {
+  return Promise.all(array.map(cb));
 }
+
+var dirs_list = function dirs_list(dirpath) {
+  try {
+    return Promise.resolve(list_async_gen(dirs_gen(dirpath)));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+var files_list = function files_list(dirpath) {
+  try {
+    return Promise.resolve(list_async_gen(files_gen(dirpath)));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+var list_async_gen = function list_async_gen(ag) {
+  try {
+    var _exit2 = false;
+
+    var _iterator, _step, _value;
+
+    var items = [];
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+
+    var _iteratorError;
+
+    var _temp6 = _finallyRethrows(function () {
+      return _catch(function () {
+        var _asyncIterator2 = _asyncIterator;
+        return Promise.resolve(ag).then(function (_ag) {
+          _iterator = _asyncIterator2(_ag);
+
+          var _temp = _for(function () {
+            return !!Promise.resolve(_iterator.next()).then(function (_iterator$next) {
+              var _iteratorNormalComple = _iteratorNormalCompletion = _step.done,
+                  _step7 = _step = _iterator$next;
+
+              return Promise.resolve(_step.value).then(function (_step$value) {
+                return _value = _step$value, !_iteratorNormalCompletion;
+              });
+            });
+          }, function () {
+            return !!(_iteratorNormalCompletion = true);
+          }, function () {
+            var el = _value;
+            items.push(el);
+          });
+
+          if (_temp && _temp.then) return _temp.then(function () {});
+        });
+      }, function (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      });
+    }, function (_wasThrown, _result3) {
+      function _temp4(_result4) {
+        if (_exit2) return _result4;
+        if (_wasThrown) throw _result3;
+        return _result3;
+      }
+
+      var _temp3 = _finallyRethrows(function () {
+        var _temp2 = function () {
+          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+            return Promise.resolve(_iterator["return"]()).then(function () {});
+          }
+        }();
+
+        if (_temp2 && _temp2.then) return _temp2.then(function () {});
+      }, function (_wasThrown2, _result4) {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+
+        if (_wasThrown2) throw _result4;
+        return _result4;
+      });
+
+      return _temp3 && _temp3.then ? _temp3.then(_temp4) : _temp4(_temp3);
+    });
+
+    return Promise.resolve(_temp6 && _temp6.then ? _temp6.then(function (_result3) {
+      return _exit2 ? _result3 : items;
+    }) : _exit2 ? _temp6 : items);
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+var FdType;
+
+(function (FdType) {
+  FdType["File"] = "f";
+  FdType["Dir"] = "d";
+  FdType["Link"] = "l";
+  FdType["Unknown"] = "u";
+})(FdType || (FdType = {}));
 
 var lstring = function lstring(filepath, encoding) {
   if (encoding === void 0) {
@@ -688,10 +800,10 @@ var fdtype = function fdtype(source) {
     return Promise.resolve(_catch(function () {
       return Promise.resolve(promises.lstat(source)).then(function (stats) {
         if (stats.isFile()) {
-          return 'f';
+          return FdType.File;
         }
 
-        return stats.isDirectory() ? 'd' : stats.isSymbolicLink() ? 'l' : '?';
+        return stats.isDirectory() ? FdType.Dir : stats.isSymbolicLink() ? FdType.Link : FdType.Unknown;
       });
     }, function (e) {
       console.log(e);
@@ -708,8 +820,8 @@ var mv = function mv(src, dest) {
         throw Error("!!!mv error: src (" + src + ") DOES NOT exist");
       }
 
-      return Promise.resolve(exists(dest)).then(function (destExists) {
-        if (destExists) {
+      return Promise.resolve(exists(dest)).then(function (dest_exists) {
+        if (dest_exists) {
           throw Error("!!!mv error: dest (" + dest + ") DOES exist");
         }
 
@@ -740,13 +852,39 @@ var ls = function ls(dirpath, abs) {
     return Promise.reject(e);
   }
 };
+var lsdirs = function lsdirs(dirpath, abs) {
+  if (abs === void 0) {
+    abs = true;
+  }
+
+  try {
+    return Promise.resolve(ls(dirpath, abs)).then(function (_ls) {
+      return Promise.resolve(filter_async(_ls, isdir));
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+var lsfiles = function lsfiles(dirpath, abs) {
+  if (abs === void 0) {
+    abs = true;
+  }
+
+  try {
+    return Promise.resolve(ls(dirpath, abs)).then(function (_ls2) {
+      return Promise.resolve(filter_async(_ls2, isfile));
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
 function walk_gen(_x) {
   return _walk_gen.apply(this, arguments);
 }
 
 function _walk_gen() {
   _walk_gen = _wrapAsyncGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(dirpath) {
-    var thingy, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, el, isd, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _value2, p;
+    var items, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _value2, el, isd, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _value3, p;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -756,31 +894,31 @@ function _walk_gen() {
             return _awaitAsyncGenerator(ls(dirpath));
 
           case 2:
-            thingy = _context.sent;
-            _iteratorNormalCompletion = true;
-            _didIteratorError = false;
+            items = _context.sent;
+            _iteratorNormalCompletion2 = true;
+            _didIteratorError2 = false;
             _context.prev = 5;
-            _iterator = _asyncIterator(thingy);
+            _iterator2 = _asyncIterator(items);
 
           case 7:
             _context.next = 9;
-            return _awaitAsyncGenerator(_iterator.next());
+            return _awaitAsyncGenerator(_iterator2.next());
 
           case 9:
-            _step = _context.sent;
-            _iteratorNormalCompletion = _step.done;
+            _step2 = _context.sent;
+            _iteratorNormalCompletion2 = _step2.done;
             _context.next = 13;
-            return _awaitAsyncGenerator(_step.value);
+            return _awaitAsyncGenerator(_step2.value);
 
           case 13:
-            _value = _context.sent;
+            _value2 = _context.sent;
 
-            if (_iteratorNormalCompletion) {
+            if (_iteratorNormalCompletion2) {
               _context.next = 59;
               break;
             }
 
-            el = _value;
+            el = _value2;
             _context.next = 18;
             return _awaitAsyncGenerator(isdir(el));
 
@@ -795,35 +933,35 @@ function _walk_gen() {
               break;
             }
 
-            _iteratorNormalCompletion2 = true;
-            _didIteratorError2 = false;
+            _iteratorNormalCompletion3 = true;
+            _didIteratorError3 = false;
             _context.prev = 24;
-            _iterator2 = _asyncIterator(walk_gen(el));
+            _iterator3 = _asyncIterator(walk_gen(el));
 
           case 26:
             _context.next = 28;
-            return _awaitAsyncGenerator(_iterator2.next());
+            return _awaitAsyncGenerator(_iterator3.next());
 
           case 28:
-            _step2 = _context.sent;
-            _iteratorNormalCompletion2 = _step2.done;
+            _step3 = _context.sent;
+            _iteratorNormalCompletion3 = _step3.done;
             _context.next = 32;
-            return _awaitAsyncGenerator(_step2.value);
+            return _awaitAsyncGenerator(_step3.value);
 
           case 32:
-            _value2 = _context.sent;
+            _value3 = _context.sent;
 
-            if (_iteratorNormalCompletion2) {
+            if (_iteratorNormalCompletion3) {
               _context.next = 40;
               break;
             }
 
-            p = _value2;
+            p = _value3;
             _context.next = 37;
             return p;
 
           case 37:
-            _iteratorNormalCompletion2 = true;
+            _iteratorNormalCompletion3 = true;
             _context.next = 26;
             break;
 
@@ -834,30 +972,30 @@ function _walk_gen() {
           case 42:
             _context.prev = 42;
             _context.t0 = _context["catch"](24);
-            _didIteratorError2 = true;
-            _iteratorError2 = _context.t0;
+            _didIteratorError3 = true;
+            _iteratorError3 = _context.t0;
 
           case 46:
             _context.prev = 46;
             _context.prev = 47;
 
-            if (!(!_iteratorNormalCompletion2 && _iterator2["return"] != null)) {
+            if (!(!_iteratorNormalCompletion3 && _iterator3["return"] != null)) {
               _context.next = 51;
               break;
             }
 
             _context.next = 51;
-            return _awaitAsyncGenerator(_iterator2["return"]());
+            return _awaitAsyncGenerator(_iterator3["return"]());
 
           case 51:
             _context.prev = 51;
 
-            if (!_didIteratorError2) {
+            if (!_didIteratorError3) {
               _context.next = 54;
               break;
             }
 
-            throw _iteratorError2;
+            throw _iteratorError3;
 
           case 54:
             return _context.finish(51);
@@ -866,7 +1004,7 @@ function _walk_gen() {
             return _context.finish(46);
 
           case 56:
-            _iteratorNormalCompletion = true;
+            _iteratorNormalCompletion2 = true;
             _context.next = 7;
             break;
 
@@ -877,30 +1015,30 @@ function _walk_gen() {
           case 61:
             _context.prev = 61;
             _context.t1 = _context["catch"](5);
-            _didIteratorError = true;
-            _iteratorError = _context.t1;
+            _didIteratorError2 = true;
+            _iteratorError2 = _context.t1;
 
           case 65:
             _context.prev = 65;
             _context.prev = 66;
 
-            if (!(!_iteratorNormalCompletion && _iterator["return"] != null)) {
+            if (!(!_iteratorNormalCompletion2 && _iterator2["return"] != null)) {
               _context.next = 70;
               break;
             }
 
             _context.next = 70;
-            return _awaitAsyncGenerator(_iterator["return"]());
+            return _awaitAsyncGenerator(_iterator2["return"]());
 
           case 70:
             _context.prev = 70;
 
-            if (!_didIteratorError) {
+            if (!_didIteratorError2) {
               _context.next = 73;
               break;
             }
 
-            throw _iteratorError;
+            throw _iteratorError2;
 
           case 73:
             return _context.finish(70);
@@ -920,77 +1058,286 @@ function _walk_gen() {
 
 var walk_list = function walk_list(dirpath) {
   try {
-    var _exit2 = false;
+    var _exit4 = false;
     var arr = [];
-    var _iteratorNormalCompletion3 = true;
-    var _didIteratorError3 = false;
+    var _iteratorNormalCompletion4 = true;
+    var _didIteratorError4 = false;
 
-    var _iteratorError3;
+    var _iteratorError4;
 
-    var _temp6 = _finallyRethrows(function () {
+    var _temp12 = _finallyRethrows(function () {
       return _catch(function () {
-        var _asyncIterator2 = _asyncIterator;
-        return Promise.resolve(walk_gen(dirpath)).then(function (_walk_gen2) {
-          var _iterator3 = _asyncIterator2(_walk_gen2),
-              _step3,
-              _value3;
+        var _iterator4 = _asyncIterator(walk_gen(dirpath)),
+            _step4,
+            _value4;
 
-          var _temp = _for(function () {
-            return !!Promise.resolve(_iterator3.next()).then(function (_iterator3$next) {
-              var _iteratorNormalComple = _iteratorNormalCompletion3 = _step3.done,
-                  _step4 = _step3 = _iterator3$next;
+        var _temp7 = _for(function () {
+          return !!Promise.resolve(_iterator4.next()).then(function (_iterator4$next) {
+            var _iteratorNormalComple2 = _iteratorNormalCompletion4 = _step4.done,
+                _step8 = _step4 = _iterator4$next;
 
-              return Promise.resolve(_step3.value).then(function (_step3$value) {
-                return _value3 = _step3$value, !_iteratorNormalCompletion3;
-              });
+            return Promise.resolve(_step4.value).then(function (_step4$value) {
+              return _value4 = _step4$value, !_iteratorNormalCompletion4;
             });
-          }, function () {
-            return !!(_iteratorNormalCompletion3 = true);
-          }, function () {
-            var el = _value3;
-            arr.push(el);
           });
-
-          if (_temp && _temp.then) return _temp.then(function () {});
+        }, function () {
+          return !!(_iteratorNormalCompletion4 = true);
+        }, function () {
+          var el = _value4;
+          arr.push(el);
         });
+
+        if (_temp7 && _temp7.then) return _temp7.then(function () {});
       }, function (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
       });
-    }, function (_wasThrown, _result3) {
-      function _temp4(_result4) {
-        if (_exit2) return _result4;
-        if (_wasThrown) throw _result3;
-        return _result3;
+    }, function (_wasThrown3, _result5) {
+      function _temp10(_result6) {
+        if (_exit4) return _result6;
+        if (_wasThrown3) throw _result5;
+        return _result5;
       }
 
-      var _temp3 = _finallyRethrows(function () {
-        var _temp2 = function () {
-          if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
-            return Promise.resolve(_iterator3["return"]()).then(function () {});
+      var _temp9 = _finallyRethrows(function () {
+        var _temp8 = function () {
+          if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
+            return Promise.resolve(_iterator4["return"]()).then(function () {});
           }
         }();
 
-        if (_temp2 && _temp2.then) return _temp2.then(function () {});
-      }, function (_wasThrown2, _result4) {
-        if (_didIteratorError3) {
-          throw _iteratorError3;
+        if (_temp8 && _temp8.then) return _temp8.then(function () {});
+      }, function (_wasThrown4, _result6) {
+        if (_didIteratorError4) {
+          throw _iteratorError4;
         }
 
-        if (_wasThrown2) throw _result4;
-        return _result4;
+        if (_wasThrown4) throw _result6;
+        return _result6;
       });
 
-      return _temp3 && _temp3.then ? _temp3.then(_temp4) : _temp4(_temp3);
+      return _temp9 && _temp9.then ? _temp9.then(_temp10) : _temp10(_temp9);
     });
 
-    return Promise.resolve(_temp6 && _temp6.then ? _temp6.then(function (_result3) {
-      return _exit2 ? _result3 : arr;
-    }) : _exit2 ? _temp6 : arr);
+    return Promise.resolve(_temp12 && _temp12.then ? _temp12.then(function (_result5) {
+      return _exit4 ? _result5 : arr;
+    }) : _exit4 ? _temp12 : arr);
   } catch (e) {
     return Promise.reject(e);
   }
 };
+function files_gen(_x2) {
+  return _files_gen.apply(this, arguments);
+}
 
-export { arange, arrmax, arrmin, b64decode, b64encode, chunk, cpfile, exists, fdtype, filter_falsey_vals, filter_keys, filter_vals, get, http, isfile, islink, keep_keys, keep_vals, ljson, ls, lstr, lstring, mkdir, mv, objectify, objkeys, post, put, sjson, sleep, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
+function _files_gen() {
+  _files_gen = _wrapAsyncGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(dirpath) {
+    var _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, _value5, el;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _iteratorNormalCompletion5 = true;
+            _didIteratorError5 = false;
+            _context2.prev = 2;
+            _iterator5 = _asyncIterator(walk_gen(dirpath));
+
+          case 4:
+            _context2.next = 6;
+            return _awaitAsyncGenerator(_iterator5.next());
+
+          case 6:
+            _step5 = _context2.sent;
+            _iteratorNormalCompletion5 = _step5.done;
+            _context2.next = 10;
+            return _awaitAsyncGenerator(_step5.value);
+
+          case 10:
+            _value5 = _context2.sent;
+
+            if (_iteratorNormalCompletion5) {
+              _context2.next = 22;
+              break;
+            }
+
+            el = _value5;
+            console.log(el);
+            _context2.next = 16;
+            return _awaitAsyncGenerator(isfile(el));
+
+          case 16:
+            if (!_context2.sent) {
+              _context2.next = 19;
+              break;
+            }
+
+            _context2.next = 19;
+            return el;
+
+          case 19:
+            _iteratorNormalCompletion5 = true;
+            _context2.next = 4;
+            break;
+
+          case 22:
+            _context2.next = 28;
+            break;
+
+          case 24:
+            _context2.prev = 24;
+            _context2.t0 = _context2["catch"](2);
+            _didIteratorError5 = true;
+            _iteratorError5 = _context2.t0;
+
+          case 28:
+            _context2.prev = 28;
+            _context2.prev = 29;
+
+            if (!(!_iteratorNormalCompletion5 && _iterator5["return"] != null)) {
+              _context2.next = 33;
+              break;
+            }
+
+            _context2.next = 33;
+            return _awaitAsyncGenerator(_iterator5["return"]());
+
+          case 33:
+            _context2.prev = 33;
+
+            if (!_didIteratorError5) {
+              _context2.next = 36;
+              break;
+            }
+
+            throw _iteratorError5;
+
+          case 36:
+            return _context2.finish(33);
+
+          case 37:
+            return _context2.finish(28);
+
+          case 38:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2, null, [[2, 24, 28, 38], [29,, 33, 37]]);
+  }));
+  return _files_gen.apply(this, arguments);
+}
+
+function dirs_gen(_x3) {
+  return _dirs_gen.apply(this, arguments);
+}
+
+function _dirs_gen() {
+  _dirs_gen = _wrapAsyncGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(dirpath) {
+    var _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _value6, el;
+
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            _iteratorNormalCompletion6 = true;
+            _didIteratorError6 = false;
+            _context3.prev = 2;
+            _iterator6 = _asyncIterator(walk_gen(dirpath));
+
+          case 4:
+            _context3.next = 6;
+            return _awaitAsyncGenerator(_iterator6.next());
+
+          case 6:
+            _step6 = _context3.sent;
+            _iteratorNormalCompletion6 = _step6.done;
+            _context3.next = 10;
+            return _awaitAsyncGenerator(_step6.value);
+
+          case 10:
+            _value6 = _context3.sent;
+
+            if (_iteratorNormalCompletion6) {
+              _context3.next = 21;
+              break;
+            }
+
+            el = _value6;
+            _context3.next = 15;
+            return _awaitAsyncGenerator(isdir(el));
+
+          case 15:
+            if (!_context3.sent) {
+              _context3.next = 18;
+              break;
+            }
+
+            _context3.next = 18;
+            return el;
+
+          case 18:
+            _iteratorNormalCompletion6 = true;
+            _context3.next = 4;
+            break;
+
+          case 21:
+            _context3.next = 27;
+            break;
+
+          case 23:
+            _context3.prev = 23;
+            _context3.t0 = _context3["catch"](2);
+            _didIteratorError6 = true;
+            _iteratorError6 = _context3.t0;
+
+          case 27:
+            _context3.prev = 27;
+            _context3.prev = 28;
+
+            if (!(!_iteratorNormalCompletion6 && _iterator6["return"] != null)) {
+              _context3.next = 32;
+              break;
+            }
+
+            _context3.next = 32;
+            return _awaitAsyncGenerator(_iterator6["return"]());
+
+          case 32:
+            _context3.prev = 32;
+
+            if (!_didIteratorError6) {
+              _context3.next = 35;
+              break;
+            }
+
+            throw _iteratorError6;
+
+          case 35:
+            return _context3.finish(32);
+
+          case 36:
+            return _context3.finish(27);
+
+          case 37:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3, null, [[2, 23, 27, 37], [28,, 32, 36]]);
+  }));
+  return _dirs_gen.apply(this, arguments);
+}
+
+var pwd = function pwd() {
+  return process.cwd();
+};
+
+var camel2snake = function camel2snake(str) {
+  return str[0].toLowerCase() + str.slice(1, str.length).replace(/[A-Z]/g, function (letter) {
+    return "_" + letter.toLowerCase();
+  });
+};
+
+export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, dirs_gen, dirs_list, exists, fdtype, files_gen, files_list, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isfile, islink, items, keep_keys, keep_vals, list_async_gen, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, post, put, pwd, sjson, sleep, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
 //# sourceMappingURL=jsse.esm.js.map

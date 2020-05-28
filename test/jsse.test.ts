@@ -3,12 +3,19 @@ import {
   arrmax,
   arrmin,
   chunk,
+  dirs_gen,
+  dirs_list,
+  files_gen,
+  files_list,
   ljson,
   lstring,
+  pwd,
   sjson,
   sort_keys_replacer,
   sstring,
   sum,
+  walk_gen,
+  walk_list,
 } from '../src';
 
 describe('sum', () => {
@@ -51,7 +58,7 @@ describe('fs-utils', () => {
   });
 
   it('JSON-IO TEST DICT: sjson and ljson', async () => {
-    const anobject = { one: 1, two: 2, three: 3 };
+    const anobject = {one: 1, two: 2, three: 3};
     const filepath = 'somefile.txt';
     await sjson(filepath, anobject);
     const loaded_stringy = await ljson(filepath);
@@ -68,7 +75,7 @@ describe('stringify', () => {
   it('sorted', () => {
     const input_obj = {
       c: 1,
-      a: { d: 0, c: 1, e: { a: 0, 1: 4 } },
+      a: {d: 0, c: 1, e: {a: 0, 1: 4}},
     };
     const exp = '{"a":{"c":1,"d":0,"e":{"1":4,"a":0}},"c":1}';
     const sorted_str = JSON.stringify(input_obj, sort_keys_replacer);
@@ -80,7 +87,44 @@ describe('stringify', () => {
     return expect(sorted_str).toEqual(exp);
   });
 });
+
+
 // console.log(JSON.stringify({
 //   c: 1,
 //   a: {d: 0, c: 1, e: {a: 0, 1: 4}},
 // }, sort_keys_replacer));
+
+describe('fs_gens', () => {
+  const tdirpath = pwd() + '/docs';
+
+  it('walk_gen and walk_list', async () => {
+    // let h = 0
+    let l = [];
+    for await (let el of await walk_gen(tdirpath)) {
+      // console.log(el);
+      l.push(el);
+      // h += 1
+
+    }
+    const wlist = await walk_list(tdirpath);
+    return expect(l.sort()).toEqual(wlist.sort());
+  });
+
+  it('files_gen and files_list', async () => {
+    const l = [];
+    for await (let el of await files_gen(tdirpath)) {
+      l.push(el);
+    }
+    const flist = await files_list(tdirpath);
+    return expect(l.sort()).toEqual(flist.sort());
+  });
+
+  it('dirs_gen and dirs_list', async () => {
+    const l = [];
+    for await (let el of await dirs_gen(tdirpath)) {
+      l.push(el);
+    }
+    const dlist = await dirs_list(tdirpath);
+    return expect(l.sort()).toEqual(dlist.sort());
+  });
+});

@@ -8,6 +8,9 @@ export declare const filter_falsey_vals: (obj: Record<any, any>) => Record<any, 
 export declare const zip: (arr: any[], ...arrs: any[]) => any[];
 export declare const objectify: (arr: any[], key: string | number) => any;
 export declare function arange(start: number, end?: number | undefined, step?: number): number[];
+export declare const items: (obj: any) => [string, unknown][];
 export declare function arrmin<T>(arr: T[]): T;
 export declare function arrmax<T>(arr: T[]): T;
-export declare function chunk<T>(arr: T[], size: number): T[][];
+export declare const chunk: (array: any[], size: number) => any[];
+export declare function map_async<T, U>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<U>): Promise<U[]>;
+export declare function filter_async<T>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<boolean>): Promise<T[]>;
