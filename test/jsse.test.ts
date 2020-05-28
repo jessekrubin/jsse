@@ -58,7 +58,7 @@ describe('fs-utils', () => {
   });
 
   it('JSON-IO TEST DICT: sjson and ljson', async () => {
-    const anobject = {one: 1, two: 2, three: 3};
+    const anobject = { one: 1, two: 2, three: 3 };
     const filepath = 'somefile.txt';
     await sjson(filepath, anobject);
     const loaded_stringy = await ljson(filepath);
@@ -75,7 +75,7 @@ describe('stringify', () => {
   it('sorted', () => {
     const input_obj = {
       c: 1,
-      a: {d: 0, c: 1, e: {a: 0, 1: 4}},
+      a: { d: 0, c: 1, e: { a: 0, 1: 4 } },
     };
     const exp = '{"a":{"c":1,"d":0,"e":{"1":4,"a":0}},"c":1}';
     const sorted_str = JSON.stringify(input_obj, sort_keys_replacer);
@@ -87,7 +87,6 @@ describe('stringify', () => {
     return expect(sorted_str).toEqual(exp);
   });
 });
-
 
 // console.log(JSON.stringify({
 //   c: 1,
@@ -104,7 +103,6 @@ describe('fs_gens', () => {
       // console.log(el);
       l.push(el);
       // h += 1
-
     }
     const wlist = await walk_list(tdirpath);
     return expect(l.sort()).toEqual(wlist.sort());
