@@ -3,10 +3,10 @@ import {
   arrmax,
   arrmin,
   chunk,
-  dirs_gen,
-  dirs_list,
-  files_gen,
-  files_list,
+  // dirs_gen,
+  // dirs_list,
+  // files_gen,
+  // files_list,
   ljson,
   lstring,
   pwd,
@@ -108,21 +108,21 @@ describe('fs_gens', () => {
     return expect(l.sort()).toEqual(wlist.sort());
   });
 
-  it('files_gen and files_list', async () => {
-    const l = [];
-    for await (let el of await files_gen(tdirpath)) {
-      l.push(el);
-    }
-    const flist = await files_list(tdirpath);
-    return expect(l.sort()).toEqual(flist.sort());
-  });
-
-  it('dirs_gen and dirs_list', async () => {
-    const l = [];
-    for await (let el of await dirs_gen(tdirpath)) {
-      l.push(el);
-    }
-    const dlist = await dirs_list(tdirpath);
-    return expect(l.sort()).toEqual(dlist.sort());
-  });
+  // it('files_gen and files_list', async () => {
+  //   const l = [];
+  //   for await (let el of await files_gen(tdirpath)) {
+  //     l.push(el);
+  //   }
+  //   const flist = await files_list(tdirpath);
+  //   return expect(l.sort()).toEqual(flist.sort());
+  // });
+  //
+  // it('dirs_gen and dirs_list', async () => {
+  //   const l = [];
+  //   for await (let el of await dirs_gen(tdirpath)) {
+  //     l.push(el);
+  //   }
+  //   const dlist = await dirs_list(tdirpath);
+  //   return expect(l.sort()).toEqual(dlist.sort());
+  // });
 });

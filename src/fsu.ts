@@ -1,7 +1,7 @@
-import {filter_async} from "./utils";
-import {promises as fs} from 'fs';
+import { promises as fs } from 'fs';
 
 import path from 'path';
+import { filter_async } from "./utils";
 
 export enum FdType {
   File = 'f',
@@ -55,7 +55,7 @@ export const sjson = async (filepath: string, data: any, sort_keys: boolean = fa
 
 export const mkdir = async (dirpath: string, exist_ok = false) => {
   try {
-    await fs.mkdir(dirpath, {recursive: true});
+    await fs.mkdir(dirpath, { recursive: true });
   } catch (err) {
     if (err.code === 'EEXIST') {
       if (!exist_ok) {
@@ -157,20 +157,22 @@ export const ls = async (dirpath: string, abs = true): Promise<string[]> => {
 };
 
 export const lsdirs = async (dirpath: string, abs: boolean = true) => {
-  return await filter_async(await ls(dirpath, abs), isdir);
+  const items = await ls(dirpath, abs);
+  return await filter_async(items, isdir);
 };
 
 export const lsfiles = async (dirpath: string, abs: boolean = true) => {
-  return await filter_async(await ls(dirpath, abs), isfile);
+  const items = await ls(dirpath, abs);
+  return await filter_async(items, isfile);
 };
 
-export async function list_async_gen<T>(ag: AsyncIterableIterator<T>): Promise<T[]> {
-  const items = [];
-  for await (const el of await ag) {
-    items.push(el);
-  }
-  return items;
-}
+// export async function list_async_gen<T>(ag: AsyncIterableIterator<T>): Promise<T[]> {
+//   const items = [];
+//   for await (const el of await ag) {
+//     items.push(el);
+//   }
+//   return items;
+// }
 
 export async function* walk_gen(dirpath: string): AsyncIterableIterator<string> {
   const items = await ls(dirpath);
@@ -185,37 +187,14 @@ export async function* walk_gen(dirpath: string): AsyncIterableIterator<string> 
   }
 }
 
+
 export const walk_list = async (dirpath: string) => {
   const arr: string[] = [];
-  for await (const el of walk_gen(dirpath)) {
+  for await (const el of await walk_gen(dirpath)) {
     arr.push(el);
   }
   return arr;
 };
-
-export async function* files_gen(dirpath: string) {
-  for await (const el of walk_gen(dirpath)) {
-    if (await isfile(el)) {
-      yield el;
-    }
-  }
-}
-
-export async function files_list(dirpath: string) {
-  return await list_async_gen(files_gen(dirpath));
-}
-
-export async function* dirs_gen(dirpath: string) {
-  for await (const el of walk_gen(dirpath)) {
-    if (await isdir(el)) {
-      yield el;
-    }
-  }
-}
-
-export async function dirs_list(dirpath: string) {
-  return await list_async_gen(dirs_gen(dirpath));
-}
 
 export const pwd = () => {
   return process.cwd();
