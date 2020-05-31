@@ -439,6 +439,17 @@ if (typeof atob === 'undefined') {
   global.atob = b64decode;
 }
 
+var filter_async = function filter_async(array, cb) {
+  try {
+    return Promise.resolve(map_async(array, cb)).then(function (filterMap) {
+      return array.filter(function (_value, index) {
+        return filterMap[index];
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
 function sleep(ms) {
   return new Promise(function (resolve) {
     return setTimeout(resolve, ms);
@@ -545,6 +556,16 @@ var chunk = function chunk(array, size) {
     return idx % size === 0 ? [].concat(arr, [[item]]) : [].concat(arr.slice(0, -1), [[].concat(arr.slice(-1)[0], [item])]);
   }, []);
 };
+function map_async(array, cb) {
+  return Promise.all(array.map(cb));
+}
+
+(function (FdType) {
+  FdType["File"] = "f";
+  FdType["Dir"] = "d";
+  FdType["Link"] = "l";
+  FdType["Unknown"] = "u";
+})(exports.FdType || (exports.FdType = {}));
 
 var lstring = function lstring(filepath, encoding) {
   if (encoding === void 0) {
@@ -695,10 +716,10 @@ var fdtype = function fdtype(source) {
     return Promise.resolve(_catch(function () {
       return Promise.resolve(fs.promises.lstat(source)).then(function (stats) {
         if (stats.isFile()) {
-          return 'f';
+          return exports.FdType.File;
         }
 
-        return stats.isDirectory() ? 'd' : stats.isSymbolicLink() ? 'l' : '?';
+        return stats.isDirectory() ? exports.FdType.Dir : stats.isSymbolicLink() ? exports.FdType.Link : exports.FdType.Unknown;
       });
     }, function (e) {
       console.log(e);
@@ -715,8 +736,8 @@ var mv = function mv(src, dest) {
         throw Error("!!!mv error: src (" + src + ") DOES NOT exist");
       }
 
-      return Promise.resolve(exists(dest)).then(function (destExists) {
-        if (destExists) {
+      return Promise.resolve(exists(dest)).then(function (dest_exists) {
+        if (dest_exists) {
           throw Error("!!!mv error: dest (" + dest + ") DOES exist");
         }
 
@@ -747,13 +768,46 @@ var ls = function ls(dirpath, abs) {
     return Promise.reject(e);
   }
 };
+var lsdirs = function lsdirs(dirpath, abs) {
+  if (abs === void 0) {
+    abs = true;
+  }
+
+  try {
+    return Promise.resolve(ls(dirpath, abs)).then(function (items) {
+      return Promise.resolve(filter_async(items, isdir));
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+var lsfiles = function lsfiles(dirpath, abs) {
+  if (abs === void 0) {
+    abs = true;
+  }
+
+  try {
+    return Promise.resolve(ls(dirpath, abs)).then(function (items) {
+      return Promise.resolve(filter_async(items, isfile));
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}; // export async function list_async_gen<T>(ag: AsyncIterableIterator<T>): Promise<T[]> {
+//   const items = [];
+//   for await (const el of await ag) {
+//     items.push(el);
+//   }
+//   return items;
+// }
+
 function walk_gen(_x) {
   return _walk_gen.apply(this, arguments);
 }
 
 function _walk_gen() {
   _walk_gen = _wrapAsyncGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(dirpath) {
-    var thingy, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, el, isd, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _value2, p;
+    var items, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, el, isd, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _value2, p;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -763,11 +817,11 @@ function _walk_gen() {
             return _awaitAsyncGenerator(ls(dirpath));
 
           case 2:
-            thingy = _context.sent;
+            items = _context.sent;
             _iteratorNormalCompletion = true;
             _didIteratorError = false;
             _context.prev = 5;
-            _iterator = _asyncIterator(thingy);
+            _iterator = _asyncIterator(items);
 
           case 7:
             _context.next = 9;
@@ -998,38 +1052,14 @@ var walk_list = function walk_list(dirpath) {
     return Promise.reject(e);
   }
 };
+var pwd = function pwd() {
+  return process.cwd();
+};
 
 var camel2snake = function camel2snake(str) {
   return str[0].toLowerCase() + str.slice(1, str.length).replace(/[A-Z]/g, function (letter) {
     return "_" + letter.toLowerCase();
   });
-};
-var pascal2camel = function pascal2camel(str) {
-  return str[0].toLowerCase() + str.slice(1, str.length);
-};
-var snake2camel = function snake2camel(str) {
-  return str.toLowerCase().replace(/([-_][a-z])/g, function (group) {
-    return group.toUpperCase().replace('-', '').replace('_', '');
-  });
-};
-
-var isnan = function isnan(num) {
-  return Number.isNaN(Number(num));
-};
-var isfin = function isfin(num) {
-  return Number.isFinite(Number(num));
-};
-var isinf = function isinf(num) {
-  return !Number.isFinite(Number(num));
-};
-var isint = function isint(num) {
-  return Number.isInteger(Number(num));
-};
-var isfloat = function isfloat(num) {
-  return !isint(num);
-};
-var isempty = function isempty(obj) {
-  return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 };
 
 exports.arange = arange;
@@ -1042,36 +1072,33 @@ exports.chunk = chunk;
 exports.cpfile = cpfile;
 exports.exists = exists;
 exports.fdtype = fdtype;
+exports.filter_async = filter_async;
 exports.filter_falsey_vals = filter_falsey_vals;
 exports.filter_keys = filter_keys;
 exports.filter_vals = filter_vals;
 exports.get = get;
 exports.http = http;
-exports.isempty = isempty;
 exports.isfile = isfile;
-exports.isfin = isfin;
-exports.isfloat = isfloat;
-exports.isinf = isinf;
-exports.isint = isint;
 exports.islink = islink;
-exports.isnan = isnan;
 exports.items = items;
 exports.keep_keys = keep_keys;
 exports.keep_vals = keep_vals;
 exports.ljson = ljson;
 exports.ls = ls;
+exports.lsdirs = lsdirs;
+exports.lsfiles = lsfiles;
 exports.lstr = lstr;
 exports.lstring = lstring;
+exports.map_async = map_async;
 exports.mkdir = mkdir;
 exports.mv = mv;
 exports.objectify = objectify;
 exports.objkeys = objkeys;
-exports.pascal2camel = pascal2camel;
 exports.post = post;
 exports.put = put;
+exports.pwd = pwd;
 exports.sjson = sjson;
 exports.sleep = sleep;
-exports.snake2camel = snake2camel;
 exports.sort_keys_replacer = sort_keys_replacer;
 exports.sstr = sstr;
 exports.sstring = sstring;

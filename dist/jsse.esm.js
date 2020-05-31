@@ -433,6 +433,17 @@ if (typeof atob === 'undefined') {
   global.atob = b64decode;
 }
 
+var filter_async = function filter_async(array, cb) {
+  try {
+    return Promise.resolve(map_async(array, cb)).then(function (filterMap) {
+      return array.filter(function (_value, index) {
+        return filterMap[index];
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
 function sleep(ms) {
   return new Promise(function (resolve) {
     return setTimeout(resolve, ms);
@@ -539,6 +550,18 @@ var chunk = function chunk(array, size) {
     return idx % size === 0 ? [].concat(arr, [[item]]) : [].concat(arr.slice(0, -1), [[].concat(arr.slice(-1)[0], [item])]);
   }, []);
 };
+function map_async(array, cb) {
+  return Promise.all(array.map(cb));
+}
+
+var FdType;
+
+(function (FdType) {
+  FdType["File"] = "f";
+  FdType["Dir"] = "d";
+  FdType["Link"] = "l";
+  FdType["Unknown"] = "u";
+})(FdType || (FdType = {}));
 
 var lstring = function lstring(filepath, encoding) {
   if (encoding === void 0) {
@@ -689,10 +712,10 @@ var fdtype = function fdtype(source) {
     return Promise.resolve(_catch(function () {
       return Promise.resolve(promises.lstat(source)).then(function (stats) {
         if (stats.isFile()) {
-          return 'f';
+          return FdType.File;
         }
 
-        return stats.isDirectory() ? 'd' : stats.isSymbolicLink() ? 'l' : '?';
+        return stats.isDirectory() ? FdType.Dir : stats.isSymbolicLink() ? FdType.Link : FdType.Unknown;
       });
     }, function (e) {
       console.log(e);
@@ -709,8 +732,8 @@ var mv = function mv(src, dest) {
         throw Error("!!!mv error: src (" + src + ") DOES NOT exist");
       }
 
-      return Promise.resolve(exists(dest)).then(function (destExists) {
-        if (destExists) {
+      return Promise.resolve(exists(dest)).then(function (dest_exists) {
+        if (dest_exists) {
           throw Error("!!!mv error: dest (" + dest + ") DOES exist");
         }
 
@@ -741,13 +764,46 @@ var ls = function ls(dirpath, abs) {
     return Promise.reject(e);
   }
 };
+var lsdirs = function lsdirs(dirpath, abs) {
+  if (abs === void 0) {
+    abs = true;
+  }
+
+  try {
+    return Promise.resolve(ls(dirpath, abs)).then(function (items) {
+      return Promise.resolve(filter_async(items, isdir));
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+var lsfiles = function lsfiles(dirpath, abs) {
+  if (abs === void 0) {
+    abs = true;
+  }
+
+  try {
+    return Promise.resolve(ls(dirpath, abs)).then(function (items) {
+      return Promise.resolve(filter_async(items, isfile));
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}; // export async function list_async_gen<T>(ag: AsyncIterableIterator<T>): Promise<T[]> {
+//   const items = [];
+//   for await (const el of await ag) {
+//     items.push(el);
+//   }
+//   return items;
+// }
+
 function walk_gen(_x) {
   return _walk_gen.apply(this, arguments);
 }
 
 function _walk_gen() {
   _walk_gen = _wrapAsyncGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(dirpath) {
-    var thingy, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, el, isd, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _value2, p;
+    var items, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, el, isd, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _value2, p;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -757,11 +813,11 @@ function _walk_gen() {
             return _awaitAsyncGenerator(ls(dirpath));
 
           case 2:
-            thingy = _context.sent;
+            items = _context.sent;
             _iteratorNormalCompletion = true;
             _didIteratorError = false;
             _context.prev = 5;
-            _iterator = _asyncIterator(thingy);
+            _iterator = _asyncIterator(items);
 
           case 7:
             _context.next = 9;
@@ -992,39 +1048,15 @@ var walk_list = function walk_list(dirpath) {
     return Promise.reject(e);
   }
 };
+var pwd = function pwd() {
+  return process.cwd();
+};
 
 var camel2snake = function camel2snake(str) {
   return str[0].toLowerCase() + str.slice(1, str.length).replace(/[A-Z]/g, function (letter) {
     return "_" + letter.toLowerCase();
   });
 };
-var pascal2camel = function pascal2camel(str) {
-  return str[0].toLowerCase() + str.slice(1, str.length);
-};
-var snake2camel = function snake2camel(str) {
-  return str.toLowerCase().replace(/([-_][a-z])/g, function (group) {
-    return group.toUpperCase().replace('-', '').replace('_', '');
-  });
-};
 
-var isnan = function isnan(num) {
-  return Number.isNaN(Number(num));
-};
-var isfin = function isfin(num) {
-  return Number.isFinite(Number(num));
-};
-var isinf = function isinf(num) {
-  return !Number.isFinite(Number(num));
-};
-var isint = function isint(num) {
-  return Number.isInteger(Number(num));
-};
-var isfloat = function isfloat(num) {
-  return !isint(num);
-};
-var isempty = function isempty(obj) {
-  return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
-};
-
-export { arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, exists, fdtype, filter_falsey_vals, filter_keys, filter_vals, get, http, isempty, isfile, isfin, isfloat, isinf, isint, islink, isnan, items, keep_keys, keep_vals, ljson, ls, lstr, lstring, mkdir, mv, objectify, objkeys, pascal2camel, post, put, sjson, sleep, snake2camel, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
+export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, exists, fdtype, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isfile, islink, items, keep_keys, keep_vals, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, post, put, pwd, sjson, sleep, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
 //# sourceMappingURL=jsse.esm.js.map

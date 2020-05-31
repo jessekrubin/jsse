@@ -1,6 +1,15 @@
-import {promises as fs} from 'fs';
+import { promises as fs } from 'fs';
 
 import path from 'path';
+import { filter_async } from "./utils";
+
+export enum FdType {
+  File = 'f',
+  Dir = 'd',
+  Link = 'l',
+  Unknown = 'u'
+}
+
 
 export const lstring = async (filepath: string, encoding = 'utf8'): Promise<string> => {
   // @ts-ignore
@@ -46,7 +55,7 @@ export const sjson = async (filepath: string, data: any, sort_keys: boolean = fa
 
 export const mkdir = async (dirpath: string, exist_ok = false) => {
   try {
-    await fs.mkdir(dirpath, {recursive: true});
+    await fs.mkdir(dirpath, { recursive: true });
   } catch (err) {
     if (err.code === 'EEXIST') {
       if (!exist_ok) {
@@ -106,19 +115,19 @@ export const islink = async (source: string): Promise<boolean> => {
   }
 };
 
-export const fdtype = async (source: string) => {
+export const fdtype = async (source: string): Promise<FdType> => {
   try {
     const stats = await fs.lstat(source);
     if (stats.isFile()) {
-      return 'f';
+      return FdType.File;
     }
     if (stats.isDirectory()) {
-      return 'd';
+      return FdType.Dir;
     }
     if (stats.isSymbolicLink()) {
-      return 'l';
+      return FdType.Link;
     }
-    return '?';
+    return FdType.Unknown;
   } catch (e) {
     console.log(e);
     throw e;
@@ -130,8 +139,8 @@ export const mv = async (src: string, dest: string) => {
   if (!srcExists) {
     throw Error(`!!!mv error: src (${src}) DOES NOT exist`);
   }
-  const destExists = await exists(dest);
-  if (destExists) {
+  const dest_exists = await exists(dest);
+  if (dest_exists) {
     throw Error(`!!!mv error: dest (${dest}) DOES exist`);
   }
   await fs.rename(src, dest);
@@ -140,19 +149,34 @@ export const mv = async (src: string, dest: string) => {
 export const ls = async (dirpath: string, abs = true): Promise<string[]> => {
   try {
     const diritems = await fs.readdir(dirpath);
-    if (abs) {
-      return diritems.map(el => path.join(dirpath, el));
-    }
-    return diritems;
+    return abs ? diritems.map(el => path.join(dirpath, el)) : diritems;
   } catch (err) {
     console.log(err);
     throw err;
   }
 };
 
+export const lsdirs = async (dirpath: string, abs: boolean = true) => {
+  const items = await ls(dirpath, abs);
+  return await filter_async(items, isdir);
+};
+
+export const lsfiles = async (dirpath: string, abs: boolean = true) => {
+  const items = await ls(dirpath, abs);
+  return await filter_async(items, isfile);
+};
+
+// export async function list_async_gen<T>(ag: AsyncIterableIterator<T>): Promise<T[]> {
+//   const items = [];
+//   for await (const el of await ag) {
+//     items.push(el);
+//   }
+//   return items;
+// }
+
 export async function* walk_gen(dirpath: string): AsyncIterableIterator<string> {
-  const thingy = await ls(dirpath);
-  for await (const el of thingy) {
+  const items = await ls(dirpath);
+  for await (const el of items) {
     const isd = await isdir(el);
     yield el;
     if (isd) {
@@ -163,10 +187,15 @@ export async function* walk_gen(dirpath: string): AsyncIterableIterator<string> 
   }
 }
 
+
 export const walk_list = async (dirpath: string) => {
   const arr: string[] = [];
   for await (const el of await walk_gen(dirpath)) {
     arr.push(el);
   }
   return arr;
+};
+
+export const pwd = () => {
+  return process.cwd();
 };

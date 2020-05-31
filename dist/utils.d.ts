@@ -12,3 +12,5 @@ export declare const items: (obj: any) => [string, unknown][];
 export declare function arrmin<T>(arr: T[]): T;
 export declare function arrmax<T>(arr: T[]): T;
 export declare const chunk: (array: any[], size: number) => any[];
+export declare function map_async<T, U>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<U>): Promise<U[]>;
+export declare function filter_async<T>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<boolean>): Promise<T[]>;

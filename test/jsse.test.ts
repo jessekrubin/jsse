@@ -3,17 +3,19 @@ import {
   arrmax,
   arrmin,
   chunk,
+  // dirs_gen,
+  // dirs_list,
+  // files_gen,
+  // files_list,
   ljson,
-  lstr,
-  sstr,
   lstring,
+  pwd,
   sjson,
-  snake2camel,
-  camel2snake,
-  pascal2camel,
   sort_keys_replacer,
   sstring,
   sum,
+  walk_gen,
+  walk_list,
 } from '../src';
 
 describe('sum', () => {
@@ -54,13 +56,6 @@ describe('fs-utils', () => {
     const loaded_stringy = await lstring(filepath);
     return expect(loaded_stringy).toEqual(stringy);
   });
-  it('STRING-IO TEST: sstr and lstr', async () => {
-    const stringy = 'this is a string\nand it has two lines';
-    const filepath = 'somefile.txt';
-    await sstr(filepath, stringy);
-    const loaded_stringy = await lstr(filepath);
-    return expect(loaded_stringy).toEqual(stringy);
-  });
 
   it('JSON-IO TEST DICT: sjson and ljson', async () => {
     const anobject = { one: 1, two: 2, three: 3 };
@@ -93,21 +88,41 @@ describe('stringify', () => {
   });
 });
 
-describe('strutils', () => {
-  const snake_str = 'this_is_a_string';
-  const camel_str = 'thisIsAString';
-  const pascal_str = 'ThisIsAString';
-  it('snake2camel', () => {
-    return expect(snake2camel(snake_str)).toEqual(camel_str);
-  });
-  it('camel2snake', () => {
-    return expect(camel2snake(camel_str)).toEqual(snake_str);
-  });
-  it('pascal2camel', () => {
-    return expect(pascal2camel(pascal_str)).toEqual(camel_str);
-  });
-});
 // console.log(JSON.stringify({
 //   c: 1,
 //   a: {d: 0, c: 1, e: {a: 0, 1: 4}},
 // }, sort_keys_replacer));
+
+describe('fs_gens', () => {
+  const tdirpath = pwd() + '/docs';
+
+  it('walk_gen and walk_list', async () => {
+    // let h = 0
+    let l = [];
+    for await (let el of await walk_gen(tdirpath)) {
+      // console.log(el);
+      l.push(el);
+      // h += 1
+    }
+    const wlist = await walk_list(tdirpath);
+    return expect(l.sort()).toEqual(wlist.sort());
+  });
+
+  // it('files_gen and files_list', async () => {
+  //   const l = [];
+  //   for await (let el of await files_gen(tdirpath)) {
+  //     l.push(el);
+  //   }
+  //   const flist = await files_list(tdirpath);
+  //   return expect(l.sort()).toEqual(flist.sort());
+  // });
+  //
+  // it('dirs_gen and dirs_list', async () => {
+  //   const l = [];
+  //   for await (let el of await dirs_gen(tdirpath)) {
+  //     l.push(el);
+  //   }
+  //   const dlist = await dirs_list(tdirpath);
+  //   return expect(l.sort()).toEqual(dlist.sort());
+  // });
+});

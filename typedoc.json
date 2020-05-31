@@ -1,0 +1,10 @@
+{
+  "out": "tsdoc",
+  "gitRemote": "https://github.com/jessekrubin/jsse",
+  "disableSources": true,
+  "excludeNotExported": true,
+  "excludeProtected": true,
+  "excludePrivate": true,
+  "includeVersion": true,
+  "inputFiles": "src"
+}
