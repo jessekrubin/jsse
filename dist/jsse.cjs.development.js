@@ -527,6 +527,9 @@ function arange(start, end, step) {
 
   return l;
 }
+var items = function items(obj) {
+  return Object.entries(obj);
+};
 function arrmin(arr) {
   return arr.reduce(function (p, v) {
     return p < v ? p : v;
@@ -537,13 +540,11 @@ function arrmax(arr) {
     return p > v ? p : v;
   });
 }
-function chunk(arr, size) {
-  return Array.from({
-    length: Math.ceil(arr.length / size)
-  }, function (_v, i) {
-    return arr.slice(i * size, i * size + size);
-  });
-}
+var chunk = function chunk(array, size) {
+  return array.reduce(function (arr, item, idx) {
+    return idx % size === 0 ? [].concat(arr, [[item]]) : [].concat(arr.slice(0, -1), [[].concat(arr.slice(-1)[0], [item])]);
+  }, []);
+};
 
 var lstring = function lstring(filepath, encoding) {
   if (encoding === void 0) {
@@ -998,11 +999,45 @@ var walk_list = function walk_list(dirpath) {
   }
 };
 
+var camel2snake = function camel2snake(str) {
+  return str[0].toLowerCase() + str.slice(1, str.length).replace(/[A-Z]/g, function (letter) {
+    return "_" + letter.toLowerCase();
+  });
+};
+var pascal2camel = function pascal2camel(str) {
+  return str[0].toLowerCase() + str.slice(1, str.length);
+};
+var snake2camel = function snake2camel(str) {
+  return str.toLowerCase().replace(/([-_][a-z])/g, function (group) {
+    return group.toUpperCase().replace('-', '').replace('_', '');
+  });
+};
+
+var isnan = function isnan(num) {
+  return Number.isNaN(Number(num));
+};
+var isfin = function isfin(num) {
+  return Number.isFinite(Number(num));
+};
+var isinf = function isinf(num) {
+  return !Number.isFinite(Number(num));
+};
+var isint = function isint(num) {
+  return Number.isInteger(Number(num));
+};
+var isfloat = function isfloat(num) {
+  return !isint(num);
+};
+var isempty = function isempty(obj) {
+  return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
+};
+
 exports.arange = arange;
 exports.arrmax = arrmax;
 exports.arrmin = arrmin;
 exports.b64decode = b64decode;
 exports.b64encode = b64encode;
+exports.camel2snake = camel2snake;
 exports.chunk = chunk;
 exports.cpfile = cpfile;
 exports.exists = exists;
@@ -1012,8 +1047,15 @@ exports.filter_keys = filter_keys;
 exports.filter_vals = filter_vals;
 exports.get = get;
 exports.http = http;
+exports.isempty = isempty;
 exports.isfile = isfile;
+exports.isfin = isfin;
+exports.isfloat = isfloat;
+exports.isinf = isinf;
+exports.isint = isint;
 exports.islink = islink;
+exports.isnan = isnan;
+exports.items = items;
 exports.keep_keys = keep_keys;
 exports.keep_vals = keep_vals;
 exports.ljson = ljson;
@@ -1024,10 +1066,12 @@ exports.mkdir = mkdir;
 exports.mv = mv;
 exports.objectify = objectify;
 exports.objkeys = objkeys;
+exports.pascal2camel = pascal2camel;
 exports.post = post;
 exports.put = put;
 exports.sjson = sjson;
 exports.sleep = sleep;
+exports.snake2camel = snake2camel;
 exports.sort_keys_replacer = sort_keys_replacer;
 exports.sstr = sstr;
 exports.sstring = sstring;

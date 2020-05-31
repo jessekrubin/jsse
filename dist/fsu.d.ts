@@ -4,9 +4,7 @@ export declare const lstr: (filepath: string, encoding?: string) => Promise<stri
 export declare const sstr: (filepath: string, str: string) => Promise<void>;
 export declare const ljson: (filepath: string) => Promise<JSON>;
 export declare function objkeys<O extends object>(obj: O): Array<keyof O>;
-export declare const sort_keys_replacer: (_key: any, value: {
-    [x: string]: any;
-}) => {};
+export declare const sort_keys_replacer: (_key: any, value: any) => any;
 export declare const sjson: (filepath: string, data: any, sort_keys?: boolean, indent?: number | undefined) => Promise<void>;
 export declare const mkdir: (dirpath: string, exist_ok?: boolean) => Promise<void>;
 export declare const cpfile: (src: string, dest: string) => Promise<void>;

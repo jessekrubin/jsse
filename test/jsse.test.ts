@@ -4,8 +4,13 @@ import {
   arrmin,
   chunk,
   ljson,
+  lstr,
+  sstr,
   lstring,
   sjson,
+  snake2camel,
+  camel2snake,
+  pascal2camel,
   sort_keys_replacer,
   sstring,
   sum,
@@ -49,6 +54,13 @@ describe('fs-utils', () => {
     const loaded_stringy = await lstring(filepath);
     return expect(loaded_stringy).toEqual(stringy);
   });
+  it('STRING-IO TEST: sstr and lstr', async () => {
+    const stringy = 'this is a string\nand it has two lines';
+    const filepath = 'somefile.txt';
+    await sstr(filepath, stringy);
+    const loaded_stringy = await lstr(filepath);
+    return expect(loaded_stringy).toEqual(stringy);
+  });
 
   it('JSON-IO TEST DICT: sjson and ljson', async () => {
     const anobject = { one: 1, two: 2, three: 3 };
@@ -78,6 +90,21 @@ describe('stringify', () => {
     //   exp,
     // );
     return expect(sorted_str).toEqual(exp);
+  });
+});
+
+describe('strutils', () => {
+  const snake_str = 'this_is_a_string';
+  const camel_str = 'thisIsAString';
+  const pascal_str = 'ThisIsAString';
+  it('snake2camel', () => {
+    return expect(snake2camel(snake_str)).toEqual(camel_str);
+  });
+  it('camel2snake', () => {
+    return expect(camel2snake(camel_str)).toEqual(snake_str);
+  });
+  it('pascal2camel', () => {
+    return expect(pascal2camel(pascal_str)).toEqual(camel_str);
   });
 });
 // console.log(JSON.stringify({
