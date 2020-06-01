@@ -1057,6 +1057,33 @@ var camel2snake = function camel2snake(str) {
     return "_" + letter.toLowerCase();
   });
 };
+var pascal2camel = function pascal2camel(str) {
+  return str[0].toLowerCase() + str.slice(1, str.length);
+};
+var snake2camel = function snake2camel(str) {
+  return str.toLowerCase().replace(/([-_][a-z])/g, function (group) {
+    return group.toUpperCase().replace('-', '').replace('_', '');
+  });
+};
 
-export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, exists, fdtype, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isfile, islink, items, keep_keys, keep_vals, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, post, put, pwd, sjson, sleep, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
+var isnan = function isnan(num) {
+  return Number.isNaN(Number(num));
+};
+var isfin = function isfin(num) {
+  return Number.isFinite(Number(num));
+};
+var isinf = function isinf(num) {
+  return !Number.isFinite(Number(num));
+};
+var isint = function isint(num) {
+  return Number.isInteger(Number(num));
+};
+var isfloat = function isfloat(num) {
+  return !isint(num);
+};
+var isempty = function isempty(obj) {
+  return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
+};
+
+export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, exists, fdtype, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isempty, isfile, isfin, isfloat, isinf, isint, islink, isnan, items, keep_keys, keep_vals, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, pascal2camel, post, put, pwd, sjson, sleep, snake2camel, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
 //# sourceMappingURL=jsse.esm.js.map

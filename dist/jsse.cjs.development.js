@@ -1061,6 +1061,33 @@ var camel2snake = function camel2snake(str) {
     return "_" + letter.toLowerCase();
   });
 };
+var pascal2camel = function pascal2camel(str) {
+  return str[0].toLowerCase() + str.slice(1, str.length);
+};
+var snake2camel = function snake2camel(str) {
+  return str.toLowerCase().replace(/([-_][a-z])/g, function (group) {
+    return group.toUpperCase().replace('-', '').replace('_', '');
+  });
+};
+
+var isnan = function isnan(num) {
+  return Number.isNaN(Number(num));
+};
+var isfin = function isfin(num) {
+  return Number.isFinite(Number(num));
+};
+var isinf = function isinf(num) {
+  return !Number.isFinite(Number(num));
+};
+var isint = function isint(num) {
+  return Number.isInteger(Number(num));
+};
+var isfloat = function isfloat(num) {
+  return !isint(num);
+};
+var isempty = function isempty(obj) {
+  return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
+};
 
 exports.arange = arange;
 exports.arrmax = arrmax;
@@ -1078,8 +1105,14 @@ exports.filter_keys = filter_keys;
 exports.filter_vals = filter_vals;
 exports.get = get;
 exports.http = http;
+exports.isempty = isempty;
 exports.isfile = isfile;
+exports.isfin = isfin;
+exports.isfloat = isfloat;
+exports.isinf = isinf;
+exports.isint = isint;
 exports.islink = islink;
+exports.isnan = isnan;
 exports.items = items;
 exports.keep_keys = keep_keys;
 exports.keep_vals = keep_vals;
@@ -1094,11 +1127,13 @@ exports.mkdir = mkdir;
 exports.mv = mv;
 exports.objectify = objectify;
 exports.objkeys = objkeys;
+exports.pascal2camel = pascal2camel;
 exports.post = post;
 exports.put = put;
 exports.pwd = pwd;
 exports.sjson = sjson;
 exports.sleep = sleep;
+exports.snake2camel = snake2camel;
 exports.sort_keys_replacer = sort_keys_replacer;
 exports.sstr = sstr;
 exports.sstring = sstring;
