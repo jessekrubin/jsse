@@ -59,7 +59,7 @@ describe('fs-utils', () => {
 
   it('JSON-IO TEST DICT: sjson and ljson', async () => {
     const anobject = { one: 1, two: 2, three: 3 };
-    const filepath = 'somefile.txt';
+    const filepath = 'somefile.json';
     await sjson(filepath, anobject);
     const loaded_stringy = await ljson(filepath);
     return expect(loaded_stringy).toEqual(anobject);

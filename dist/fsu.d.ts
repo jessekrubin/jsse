@@ -9,12 +9,19 @@ export declare const sstring: (filepath: string, str: string) => Promise<void>;
 export declare const lstr: (filepath: string, encoding?: string) => Promise<string>;
 export declare const sstr: (filepath: string, str: string) => Promise<void>;
 export declare const ljson: (filepath: string) => Promise<JSON>;
-export declare function objkeys<O extends object>(obj: O): Array<keyof O>;
 export declare const sort_keys_replacer: (_key: any, value: any) => any;
-export declare const sjson: (filepath: string, data: any, sort_keys?: boolean, indent?: number | undefined) => Promise<void>;
+export declare const dumps: (data: any, opts?: {
+    sort_keys?: boolean;
+    indent?: number | undefined;
+}) => string;
+export declare const sjson: (filepath: string, data: any, opts?: {
+    sort_keys?: boolean;
+    indent?: number | undefined;
+}) => Promise<void>;
 export declare const mkdir: (dirpath: string, exist_ok?: boolean) => Promise<void>;
 export declare const cpfile: (src: string, dest: string) => Promise<void>;
 export declare const exists: (pathstr: string) => Promise<boolean>;
+export declare const isdir: (source: string) => Promise<boolean>;
 export declare const isfile: (source: string) => Promise<boolean>;
 export declare const islink: (source: string) => Promise<boolean>;
 export declare const fdtype: (source: string) => Promise<FdType>;

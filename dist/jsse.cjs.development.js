@@ -559,6 +559,12 @@ var chunk = function chunk(array, size) {
 function map_async(array, cb) {
   return Promise.all(array.map(cb));
 }
+function objkeys(obj) {
+  return Object.keys(obj);
+}
+function jsoncp(data) {
+  return JSON.parse(JSON.stringify(data));
+}
 
 (function (FdType) {
   FdType["File"] = "f";
@@ -596,26 +602,38 @@ var ljson = function ljson(filepath) {
     return Promise.reject(e);
   }
 };
-function objkeys(obj) {
-  return Object.keys(obj);
-}
 var sort_keys_replacer = function sort_keys_replacer(_key, value) {
   return value instanceof Object && !(value instanceof Array) ? Object.keys(value).sort().reduce(function (sorted, key) {
     sorted[key] = value[key];
     return sorted;
   }, {}) : value;
-}; // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-var sjson = function sjson(filepath, data, sort_keys, indent) {
-  if (sort_keys === void 0) {
-    sort_keys = false;
+};
+var dumps = function dumps(data, opts) {
+  if (opts === void 0) {
+    opts = {};
   }
 
-  if (indent === void 0) {
-    indent = undefined;
+  var _opts = opts,
+      _opts$sort_keys = _opts.sort_keys,
+      sort_keys = _opts$sort_keys === void 0 ? false : _opts$sort_keys,
+      _opts$indent = _opts.indent,
+      indent = _opts$indent === void 0 ? undefined : _opts$indent;
+  var replacer = sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
+  return JSON.stringify(data, // @ts-ignore
+  replacer, indent);
+}; // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+var sjson = function sjson(filepath, data, opts) {
+  if (opts === void 0) {
+    opts = {};
   }
 
   try {
+    var _opts2 = opts,
+        _opts2$sort_keys = _opts2.sort_keys,
+        sort_keys = _opts2$sort_keys === void 0 ? false : _opts2$sort_keys,
+        _opts2$indent = _opts2.indent,
+        indent = _opts2$indent === void 0 ? undefined : _opts2$indent;
     var replacer = sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
     return Promise.resolve(sstring(filepath, JSON.stringify(data, // @ts-ignore
     replacer, indent))).then(function () {});
@@ -667,7 +685,6 @@ var exists = function exists(pathstr) {
     return false;
   }));
 };
-
 var isdir = function isdir(source) {
   try {
     return Promise.resolve(_catch(function () {
@@ -682,7 +699,6 @@ var isdir = function isdir(source) {
     return Promise.reject(e);
   }
 };
-
 var isfile = function isfile(source) {
   try {
     return Promise.resolve(_catch(function () {
@@ -1097,6 +1113,7 @@ exports.b64encode = b64encode;
 exports.camel2snake = camel2snake;
 exports.chunk = chunk;
 exports.cpfile = cpfile;
+exports.dumps = dumps;
 exports.exists = exists;
 exports.fdtype = fdtype;
 exports.filter_async = filter_async;
@@ -1105,6 +1122,7 @@ exports.filter_keys = filter_keys;
 exports.filter_vals = filter_vals;
 exports.get = get;
 exports.http = http;
+exports.isdir = isdir;
 exports.isempty = isempty;
 exports.isfile = isfile;
 exports.isfin = isfin;
@@ -1114,6 +1132,7 @@ exports.isint = isint;
 exports.islink = islink;
 exports.isnan = isnan;
 exports.items = items;
+exports.jsoncp = jsoncp;
 exports.keep_keys = keep_keys;
 exports.keep_vals = keep_vals;
 exports.ljson = ljson;

@@ -101,3 +101,11 @@ export async function filter_async<T>(array: T[], cb: (value: T, index: number, 
   const filterMap = await map_async(array, cb);
   return array.filter((_value, index) => filterMap[index]);
 }
+
+export function objkeys<O extends object>(obj: O): Array<keyof O> {
+  return Object.keys(obj) as Array<keyof O>;
+}
+
+export function jsoncp<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data))
+}

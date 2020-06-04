@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import { promises as fsp } from 'fs';
 
 import path from 'path';
 import { filter_async } from "./utils";
@@ -10,15 +10,14 @@ export enum FdType {
   Unknown = 'u'
 }
 
-
 export const lstring = async (filepath: string, encoding = 'utf8'): Promise<string> => {
   // @ts-ignore
-  return String(await fs.readFile(filepath, encoding));
+  return String(await fsp.readFile(filepath, encoding));
 };
 
 
 export const sstring = async (filepath: string, str: string) => {
-  await fs.writeFile(filepath, str);
+  await fsp.writeFile(filepath, str);
 };
 
 export const lstr = lstring;
@@ -27,10 +26,6 @@ export const sstr = sstring;
 export const ljson = async (filepath: string): Promise<JSON> => {
   return JSON.parse(await lstring(filepath));
 };
-
-export function objkeys<O extends object>(obj: O): Array<keyof O> {
-  return Object.keys(obj) as Array<keyof O>;
-}
 
 export const sort_keys_replacer = (_key: any, value: { [x: string]: any; } | any[] | any) =>
   value instanceof Object && !(value instanceof Array) ?
@@ -42,8 +37,30 @@ export const sort_keys_replacer = (_key: any, value: { [x: string]: any; } | any
       }, {}) :
     value;
 
+
+export const dumps = (data: any,
+                      opts: {
+                        sort_keys?: boolean,
+                        indent?: number | undefined,
+                      } = {}) => {
+  const { sort_keys = false, indent = undefined } = opts;
+  const replacer = (sort_keys && typeof data === 'object') ? sort_keys_replacer : null;
+  return JSON.stringify(
+    data,
+    // @ts-ignore
+    replacer,
+    indent,
+  )
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sjson = async (filepath: string, data: any, sort_keys: boolean = false, indent: number | undefined = undefined) => {
+export const sjson = async (filepath: string, data: any,
+                            opts: {
+                              sort_keys?: boolean,
+                              indent?: number | undefined,
+                            } = {}
+) => {
+  const { sort_keys = false, indent = undefined } = opts;
   const replacer = (sort_keys && typeof data === 'object') ? sort_keys_replacer : null;
   await sstring(filepath, JSON.stringify(
     data,
@@ -55,7 +72,7 @@ export const sjson = async (filepath: string, data: any, sort_keys: boolean = fa
 
 export const mkdir = async (dirpath: string, exist_ok = false) => {
   try {
-    await fs.mkdir(dirpath, { recursive: true });
+    await fsp.mkdir(dirpath, { recursive: true });
   } catch (err) {
     if (err.code === 'EEXIST') {
       if (!exist_ok) {
@@ -69,7 +86,7 @@ export const mkdir = async (dirpath: string, exist_ok = false) => {
 
 export const cpfile = async (src: string, dest: string) => {
   try {
-    await fs.copyFile(src, dest);
+    await fsp.copyFile(src, dest);
   } catch (error) {
     console.log(error);
     throw error;
@@ -78,16 +95,16 @@ export const cpfile = async (src: string, dest: string) => {
 
 export const exists = async (pathstr: string) => {
   try {
-    await fs.access(pathstr);
+    await fsp.access(pathstr);
     return true;
   } catch (error) {
     return false;
   }
 };
 
-const isdir = async (source: string) => {
+export const isdir = async (source: string) => {
   try {
-    const stats = await fs.lstat(source);
+    const stats = await fsp.lstat(source);
     return stats.isDirectory();
   } catch (e) {
     console.log(e);
@@ -97,7 +114,7 @@ const isdir = async (source: string) => {
 
 export const isfile = async (source: string) => {
   try {
-    const stats = await fs.lstat(source);
+    const stats = await fsp.lstat(source);
     return stats.isFile();
   } catch (e) {
     console.log(e);
@@ -107,7 +124,7 @@ export const isfile = async (source: string) => {
 
 export const islink = async (source: string): Promise<boolean> => {
   try {
-    const stats = await fs.lstat(source);
+    const stats = await fsp.lstat(source);
     return stats.isSymbolicLink();
   } catch (e) {
     console.log(e);
@@ -117,7 +134,7 @@ export const islink = async (source: string): Promise<boolean> => {
 
 export const fdtype = async (source: string): Promise<FdType> => {
   try {
-    const stats = await fs.lstat(source);
+    const stats = await fsp.lstat(source);
     if (stats.isFile()) {
       return FdType.File;
     }
@@ -143,12 +160,12 @@ export const mv = async (src: string, dest: string) => {
   if (dest_exists) {
     throw Error(`!!!mv error: dest (${dest}) DOES exist`);
   }
-  await fs.rename(src, dest);
+  await fsp.rename(src, dest);
 };
 
 export const ls = async (dirpath: string, abs = true): Promise<string[]> => {
   try {
-    const diritems = await fs.readdir(dirpath);
+    const diritems = await fsp.readdir(dirpath);
     return abs ? diritems.map(el => path.join(dirpath, el)) : diritems;
   } catch (err) {
     console.log(err);
@@ -199,3 +216,4 @@ export const walk_list = async (dirpath: string) => {
 export const pwd = () => {
   return process.cwd();
 };
+
