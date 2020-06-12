@@ -9,34 +9,34 @@ export const sum = (a: number, b: number) => {
   return a + b;
 };
 export const keep_keys = (obj: Record<any, any>, keys: string[]) => {
-  return Object.keys(obj).reduce(function(r: Record<any, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
     if (keys.includes(e)) r[e] = obj[e];
     return r;
   }, {});
 };
 export const keep_vals = (obj: Record<any, any>, vals: any[]) => {
-  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
     if (vals.includes(obj[e])) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_keys = (obj: Record<any, any>, keys: string[]) => {
-  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
     if (!keys.includes(e)) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_vals = (obj: Record<any, any>, vals: any[]) => {
-  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
     if (!vals.includes(obj[e])) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_falsey_vals = (obj: Record<any, any>) => {
-  return Object.keys(obj).reduce(function(r: Record<any, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
     if (obj[e]) r[e] = obj[e];
     return r;
   }, {});
@@ -60,7 +60,7 @@ export const objectify = (arr: any[], key: string | number) => {
 export function arange(
   start: number,
   end: number | undefined = undefined,
-  step = 1
+  step = 1,
 ): number[] {
   if (end === undefined) [ end, start ] = [ start, 0 ];
   let l = [];
@@ -74,13 +74,13 @@ export const items = (obj: any) => {
 };
 
 export function arrmin<T>(arr: T[]): T {
-  return arr.reduce(function(p, v) {
+  return arr.reduce(function (p, v) {
     return p < v ? p : v;
   });
 }
 
 export function arrmax<T>(arr: T[]): T {
-  return arr.reduce(function(p, v) {
+  return arr.reduce(function (p, v) {
     return p > v ? p : v;
   });
 }
@@ -107,5 +107,9 @@ export function objkeys<O extends object>(obj: O): Array<keyof O> {
 }
 
 export function jsoncp<T>(data: T): T {
-  return JSON.parse(JSON.stringify(data))
+  return JSON.parse(JSON.stringify(data));
+}
+
+export function usort<T>(array: T[]): T[] {
+  return [ ...new Set(array) ].sort();
 }
