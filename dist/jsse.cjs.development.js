@@ -565,6 +565,10 @@ function objkeys(obj) {
 function jsoncp(data) {
   return JSON.parse(JSON.stringify(data));
 }
+function usort(array) {
+  var s = new Set(array);
+  return Array.from(s).sort();
+}
 
 (function (FdType) {
   FdType["File"] = "f";
@@ -1157,6 +1161,7 @@ exports.sort_keys_replacer = sort_keys_replacer;
 exports.sstr = sstr;
 exports.sstring = sstring;
 exports.sum = sum;
+exports.usort = usort;
 exports.walk_gen = walk_gen;
 exports.walk_list = walk_list;
 exports.zip = zip;

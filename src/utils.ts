@@ -111,5 +111,6 @@ export function jsoncp<T>(data: T): T {
 }
 
 export function usort<T>(array: T[]): T[] {
-  return [ ...new Set(array) ].sort();
+  const s = new Set(array);
+  return Array.from(s).sort();
 }

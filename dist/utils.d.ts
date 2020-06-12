@@ -16,3 +16,4 @@ export declare function map_async<T, U>(array: T[], cb: (value: T, index: number
 export declare function filter_async<T>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<boolean>): Promise<T[]>;
 export declare function objkeys<O extends object>(obj: O): Array<keyof O>;
 export declare function jsoncp<T>(data: T): T;
+export declare function usort<T>(array: T[]): T[];

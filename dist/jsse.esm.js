@@ -559,6 +559,10 @@ function objkeys(obj) {
 function jsoncp(data) {
   return JSON.parse(JSON.stringify(data));
 }
+function usort(array) {
+  var s = new Set(array);
+  return Array.from(s).sort();
+}
 
 var FdType;
 
@@ -1101,5 +1105,5 @@ var isempty = function isempty(obj) {
   return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 };
 
-export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, dumps, exists, fdtype, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isdir, isempty, isfile, isfin, isfloat, isinf, isint, islink, isnan, items, jsoncp, keep_keys, keep_vals, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, pascal2camel, post, put, pwd, sjson, sleep, snake2camel, sort_keys_replacer, sstr, sstring, sum, walk_gen, walk_list, zip };
+export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, dumps, exists, fdtype, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isdir, isempty, isfile, isfin, isfloat, isinf, isint, islink, isnan, items, jsoncp, keep_keys, keep_vals, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, pascal2camel, post, put, pwd, sjson, sleep, snake2camel, sort_keys_replacer, sstr, sstring, sum, usort, walk_gen, walk_list, zip };
 //# sourceMappingURL=jsse.esm.js.map
