@@ -11,9 +11,11 @@ export declare function arange(start: number, end?: number | undefined, step?: n
 export declare const items: (obj: any) => [string, unknown][];
 export declare function arrmin<T>(arr: T[]): T;
 export declare function arrmax<T>(arr: T[]): T;
-export declare const chunk: (array: any[], size: number) => any[];
+export declare function chunk<T>(array: T[], size: number): T[][];
 export declare function map_async<T, U>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<U>): Promise<U[]>;
 export declare function filter_async<T>(array: T[], cb: (value: T, index: number, array: T[]) => Promise<boolean>): Promise<T[]>;
 export declare function objkeys<O extends object>(obj: O): Array<keyof O>;
 export declare function jsoncp<T>(data: T): T;
+export declare function unique<T>(array: T[]): T[];
 export declare function usort<T>(array: T[]): T[];
+export declare function pathjoin(parts: string[], sep?: string): string;

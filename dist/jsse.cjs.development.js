@@ -551,11 +551,11 @@ function arrmax(arr) {
     return p > v ? p : v;
   });
 }
-var chunk = function chunk(array, size) {
+function chunk(array, size) {
   return array.reduce(function (arr, item, idx) {
     return idx % size === 0 ? [].concat(arr, [[item]]) : [].concat(arr.slice(0, -1), [[].concat(arr.slice(-1)[0], [item])]);
   }, []);
-};
+}
 function map_async(array, cb) {
   return Promise.all(array.map(cb));
 }
@@ -565,9 +565,31 @@ function objkeys(obj) {
 function jsoncp(data) {
   return JSON.parse(JSON.stringify(data));
 }
-function usort(array) {
+function unique(array) {
   var s = new Set(array);
-  return Array.from(s).sort();
+  return Array.from(s);
+}
+function usort(array) {
+  return unique(array).sort();
+}
+function pathjoin(parts, sep) {
+  if (sep === void 0) {
+    sep = '/';
+  }
+
+  var separator = sep || '/';
+  parts = parts.map(function (part, index) {
+    if (index) {
+      part = part.replace(new RegExp('^' + separator), '');
+    }
+
+    if (index !== parts.length - 1) {
+      part = part.replace(new RegExp(separator + '$'), '');
+    }
+
+    return part;
+  });
+  return parts.join(separator);
 }
 
 (function (FdType) {
@@ -1151,6 +1173,7 @@ exports.mv = mv;
 exports.objectify = objectify;
 exports.objkeys = objkeys;
 exports.pascal2camel = pascal2camel;
+exports.pathjoin = pathjoin;
 exports.post = post;
 exports.put = put;
 exports.pwd = pwd;
@@ -1161,6 +1184,7 @@ exports.sort_keys_replacer = sort_keys_replacer;
 exports.sstr = sstr;
 exports.sstring = sstring;
 exports.sum = sum;
+exports.unique = unique;
 exports.usort = usort;
 exports.walk_gen = walk_gen;
 exports.walk_list = walk_list;

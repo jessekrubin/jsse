@@ -545,11 +545,11 @@ function arrmax(arr) {
     return p > v ? p : v;
   });
 }
-var chunk = function chunk(array, size) {
+function chunk(array, size) {
   return array.reduce(function (arr, item, idx) {
     return idx % size === 0 ? [].concat(arr, [[item]]) : [].concat(arr.slice(0, -1), [[].concat(arr.slice(-1)[0], [item])]);
   }, []);
-};
+}
 function map_async(array, cb) {
   return Promise.all(array.map(cb));
 }
@@ -559,9 +559,31 @@ function objkeys(obj) {
 function jsoncp(data) {
   return JSON.parse(JSON.stringify(data));
 }
-function usort(array) {
+function unique(array) {
   var s = new Set(array);
-  return Array.from(s).sort();
+  return Array.from(s);
+}
+function usort(array) {
+  return unique(array).sort();
+}
+function pathjoin(parts, sep) {
+  if (sep === void 0) {
+    sep = '/';
+  }
+
+  var separator = sep || '/';
+  parts = parts.map(function (part, index) {
+    if (index) {
+      part = part.replace(new RegExp('^' + separator), '');
+    }
+
+    if (index !== parts.length - 1) {
+      part = part.replace(new RegExp(separator + '$'), '');
+    }
+
+    return part;
+  });
+  return parts.join(separator);
 }
 
 var FdType;
@@ -1105,5 +1127,5 @@ var isempty = function isempty(obj) {
   return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 };
 
-export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, dumps, exists, fdtype, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isdir, isempty, isfile, isfin, isfloat, isinf, isint, islink, isnan, items, jsoncp, keep_keys, keep_vals, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, pascal2camel, post, put, pwd, sjson, sleep, snake2camel, sort_keys_replacer, sstr, sstring, sum, usort, walk_gen, walk_list, zip };
+export { FdType, arange, arrmax, arrmin, b64decode, b64encode, camel2snake, chunk, cpfile, dumps, exists, fdtype, filter_async, filter_falsey_vals, filter_keys, filter_vals, get, http, isdir, isempty, isfile, isfin, isfloat, isinf, isint, islink, isnan, items, jsoncp, keep_keys, keep_vals, ljson, ls, lsdirs, lsfiles, lstr, lstring, map_async, mkdir, mv, objectify, objkeys, pascal2camel, pathjoin, post, put, pwd, sjson, sleep, snake2camel, sort_keys_replacer, sstr, sstring, sum, unique, usort, walk_gen, walk_list, zip };
 //# sourceMappingURL=jsse.esm.js.map

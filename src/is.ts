@@ -14,5 +14,8 @@ export const isfloat = (num: string | number) => {
   return !isint(num);
 };
 export const isempty = (obj: any) => {
-  return [Object, Array].includes((obj || {}).constructor) && !Object.entries((obj || {})).length;
+  return (
+    [Object, Array].includes((obj || {}).constructor) &&
+    !Object.entries(obj || {}).length
+  );
 };
