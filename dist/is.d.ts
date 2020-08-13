@@ -4,3 +4,4 @@ export declare const isinf: (num: string | number) => boolean;
 export declare const isint: (num: string | number) => boolean;
 export declare const isfloat: (num: string | number) => boolean;
 export declare const isempty: (obj: any) => boolean;
+export default function isArrayBuffer(obj: any): boolean;

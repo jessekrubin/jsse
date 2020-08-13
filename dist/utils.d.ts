@@ -19,3 +19,11 @@ export declare function jsoncp<T>(data: T): T;
 export declare function unique<T>(array: T[]): T[];
 export declare function usort<T>(array: T[]): T[];
 export declare function pathjoin(parts: string[], sep?: string): string;
+export declare function fmt_nbytes(bytes: number): string;
+export declare function objtype(obj: any): string;
+export declare function nbytes(obj: any): number;
+export declare function objinfo(obj: any): {
+    size: number;
+    size_str: string;
+    obj_type: string;
+};

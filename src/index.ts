@@ -4,3 +4,4 @@ export * from './utils';
 export * from './fsu';
 export * from './strutils';
 export * from './is';
+export * from './has';

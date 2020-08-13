@@ -340,16 +340,16 @@ function _finallyRethrows(body, finalizer) {
 	return finalizer(false, result);
 }
 
-var put = function put(path, body, args) {
+var put = function put(path, body, opts) {
   try {
-    if (args === undefined) args = {
+    if (opts === undefined) opts = {
       method: 'put',
       body: JSON.stringify(body)
     };
     return Promise.resolve(http(new Request(path, _extends({
       method: 'put',
       body: JSON.stringify(body)
-    }, args))));
+    }, opts))));
   } catch (e) {
     return Promise.reject(e);
   }
@@ -367,25 +367,25 @@ var put = function put(path, body, args) {
  *
  * @param path
  * @param body
- * @param args
+ * @param opts
  */
-var post = function post(path, body, args) {
+var post = function post(path, body, opts) {
   try {
-    if (args === undefined) args = {
+    if (opts === undefined) opts = {
       method: 'post',
       body: JSON.stringify(body)
     };
     return Promise.resolve(http(new Request(path, _extends({
       method: 'post',
       body: JSON.stringify(body)
-    }, args))));
+    }, opts))));
   } catch (e) {
     return Promise.reject(e);
   }
 };
-var get = function get(path, args) {
-  if (args === void 0) {
-    args = {
+var get = function get(path, opts) {
+  if (opts === void 0) {
+    opts = {
       method: 'get'
     };
   }
@@ -393,7 +393,7 @@ var get = function get(path, args) {
   try {
     return Promise.resolve(http(new Request(path, _extends({
       method: 'get'
-    }, args))));
+    }, opts))));
   } catch (e) {
     return Promise.reject(e);
   }
@@ -590,6 +590,82 @@ function pathjoin(parts, sep) {
     return part;
   });
   return parts.join(separator);
+}
+function fmt_nbytes(bytes) {
+  if (bytes < 1024) return bytes + ' bytes';else if (bytes < 1048576) return (bytes / 1024).toFixed(3) + ' KiB';else if (bytes < 1073741824) return (bytes / 1048576).toFixed(3) + ' MiB';else return (bytes / 1073741824).toFixed(3) + ' GiB';
+}
+function objtype(obj) {
+  if (obj === null) {
+    return 'null';
+  }
+
+  if (obj === undefined) {
+    return 'undefined';
+  }
+
+  switch (typeof obj) {
+    case 'number':
+      return 'number';
+
+    case 'string':
+      return 'string';
+
+    case 'boolean':
+      return 'boolean';
+
+    case 'object':
+      return Object.prototype.toString.call(obj).slice(8, -1);
+  }
+
+  throw Error('Cannot determine obj_type ' + String(obj));
+}
+function nbytes(obj) {
+  var bytes = 0;
+
+  function _nbytes(obj) {
+    if (obj !== null && obj !== undefined) {
+      switch (typeof obj) {
+        case 'number':
+          bytes += 8;
+          break;
+
+        case 'string':
+          bytes += obj.length * 2;
+          break;
+
+        case 'boolean':
+          bytes += 4;
+          break;
+
+        case 'object':
+          var objcls = Object.prototype.toString.call(obj).slice(8, -1);
+
+          if (objcls === 'Object' || objcls === 'Array') {
+            for (var key in obj) {
+              if (!obj.hasOwnProperty(key)) continue;
+
+              _nbytes(obj[key]);
+            }
+          } else if (objcls === 'ArrayBuffer') {
+            bytes += obj.byteLength;
+            break;
+          } else bytes += obj.toString().length * 2;
+
+          break;
+      }
+    }
+
+    return bytes;
+  }
+  return _nbytes(obj);
+}
+function objinfo(obj) {
+  var size = nbytes(obj);
+  return {
+    size: size,
+    size_str: fmt_nbytes(size),
+    obj_type: objtype(obj)
+  };
 }
 
 (function (FdType) {
@@ -1112,6 +1188,11 @@ var snake2camel = function snake2camel(str) {
   });
 };
 
+var hasArrayBuffer = typeof ArrayBuffer === 'function';
+var haskey = function haskey(obj, key) {
+  return obj.hasOwnProperty(key);
+};
+
 var isnan = function isnan(num) {
   return Number.isNaN(Number(num));
 };
@@ -1146,7 +1227,10 @@ exports.filter_async = filter_async;
 exports.filter_falsey_vals = filter_falsey_vals;
 exports.filter_keys = filter_keys;
 exports.filter_vals = filter_vals;
+exports.fmt_nbytes = fmt_nbytes;
 exports.get = get;
+exports.hasArrayBuffer = hasArrayBuffer;
+exports.haskey = haskey;
 exports.http = http;
 exports.isdir = isdir;
 exports.isempty = isempty;
@@ -1170,8 +1254,11 @@ exports.lstring = lstring;
 exports.map_async = map_async;
 exports.mkdir = mkdir;
 exports.mv = mv;
+exports.nbytes = nbytes;
 exports.objectify = objectify;
+exports.objinfo = objinfo;
 exports.objkeys = objkeys;
+exports.objtype = objtype;
 exports.pascal2camel = pascal2camel;
 exports.pathjoin = pathjoin;
 exports.post = post;

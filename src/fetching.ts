@@ -16,9 +16,9 @@ export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
 
 export async function get<T>(
   path: string,
-  args: RequestInit = { method: 'get' }
+  opts: RequestInit = { method: 'get' }
 ): Promise<HttpResponse<T>> {
-  return await http<T>(new Request(path, { method: 'get', ...args }));
+  return await http<T>(new Request(path, { method: 'get', ...opts }));
 }
 
 /**
@@ -33,18 +33,18 @@ export async function get<T>(
  *
  * @param path
  * @param body
- * @param args
+ * @param opts
  */
 export async function post<T>(
   path: string,
   body: any,
-  args: RequestInit = { method: 'post', body: JSON.stringify(body) }
+  opts: RequestInit = { method: 'post', body: JSON.stringify(body) }
 ): Promise<HttpResponse<T>> {
   return await http<T>(
     new Request(path, {
       method: 'post',
       body: JSON.stringify(body),
-      ...args,
+      ...opts,
     })
   );
 }
@@ -52,13 +52,13 @@ export async function post<T>(
 export async function put<T>(
   path: string,
   body: any,
-  args: RequestInit = { method: 'put', body: JSON.stringify(body) }
+  opts: RequestInit = { method: 'put', body: JSON.stringify(body) }
 ): Promise<HttpResponse<T>> {
   return await http<T>(
     new Request(path, {
       method: 'put',
       body: JSON.stringify(body),
-      ...args,
+      ...opts,
     })
   );
 }

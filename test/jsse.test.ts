@@ -12,10 +12,12 @@ import {
   pwd,
   sjson,
   sort_keys_replacer,
+  nbytes,
   sstring,
   sum,
   walk_gen,
   walk_list,
+  objinfo,
 } from '../src';
 
 describe('sum', () => {
@@ -45,6 +47,40 @@ describe('arrmax arrmin', () => {
 
   it('arrmin strings', async () => {
     return expect(arrmin(['a', 'b', 'zebra'])).toEqual('a');
+  });
+});
+
+describe('object info ArrayBuffer', () => {
+  const buffer = new ArrayBuffer(8);
+  const { size, size_str, obj_type } = objinfo(buffer);
+
+  it('objtype', async () => {
+    return expect(obj_type).toEqual('ArrayBuffer');
+  });
+  it('size', async () => {
+    return expect(size).toEqual(8);
+  });
+  it('sizestr', async () => {
+    // return expect(obj_type).toEqual('Array');
+    return expect(size_str).toEqual('8 bytes');
+  });
+});
+describe('object info', () => {
+  const { size, size_str, obj_type } = objinfo(['a', 'b', 'zebra']);
+  it('objtype', async () => {
+    return expect(obj_type).toEqual('Array');
+  });
+  it('size', async () => {
+    return expect(size).toEqual(14);
+  });
+  it('sizestr', async () => {
+    // return expect(obj_type).toEqual('Array');
+    return expect(size_str).toEqual('14 bytes');
+  });
+});
+describe('size of object', () => {
+  it('uno', async () => {
+    return expect(nbytes(['a', 'b', 'zebra'])).toEqual(14);
   });
 });
 
