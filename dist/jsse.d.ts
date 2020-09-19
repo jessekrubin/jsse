@@ -1,4 +1,10 @@
+export declare const __version__ = "0.1.12";
 export declare function sleep(ms: number): Promise<unknown>;
+export declare const sort_keys_replacer: (_key: any, value: any) => any;
+export declare const dumps: (data: any, opts?: {
+    sort_keys?: boolean;
+    indent?: number | undefined;
+}) => string;
 export declare const keep_keys: (obj: Record<any, any>, keys: string[]) => Record<any, any>;
 export declare const keep_vals: (obj: Record<any, any>, vals: any[]) => Record<string, any>;
 export declare const filter_keys: (obj: Record<any, any>, keys: string[]) => Record<string, any>;
@@ -26,3 +32,15 @@ export declare function objinfo(obj: any): {
     size_str: string;
     obj_type: string;
 };
+export declare const hasArrayBuffer: boolean;
+export declare const haskey: (obj: any, key: string) => boolean;
+export declare const isnan: (num: string | number) => boolean;
+export declare const isfin: (num: string | number) => boolean;
+export declare const isinf: (num: string | number) => boolean;
+export declare const isint: (num: string | number) => boolean;
+export declare const isfloat: (num: string | number) => boolean;
+export declare const isempty: (obj: any) => boolean;
+export declare function isArrayBuffer(obj: any): boolean;
+export declare const camel2snake: (str: string) => string;
+export declare const pascal2camel: (str: string) => string;
+export declare const snake2camel: (str: string) => string;

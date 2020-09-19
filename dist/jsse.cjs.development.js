@@ -149,11 +149,32 @@ var filter_async = function filter_async(array, cb) {
     return Promise.reject(e);
   }
 };
+var __version__ = "0.1.12";
 function sleep(ms) {
   return new Promise(function (resolve) {
     return setTimeout(resolve, ms);
   });
 }
+var sort_keys_replacer = function sort_keys_replacer(_key, value) {
+  return value instanceof Object && !(value instanceof Array) ? Object.keys(value).sort().reduce(function (sorted, key) {
+    sorted[key] = value[key];
+    return sorted;
+  }, {}) : value;
+};
+var dumps = function dumps(data, opts) {
+  if (opts === void 0) {
+    opts = {};
+  }
+
+  var _opts = opts,
+      _opts$sort_keys = _opts.sort_keys,
+      sort_keys = _opts$sort_keys === void 0 ? false : _opts$sort_keys,
+      _opts$indent = _opts.indent,
+      indent = _opts$indent === void 0 ? undefined : _opts$indent;
+  var replacer = sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
+  return JSON.stringify(data, // @ts-ignore
+  replacer, indent);
+};
 var keep_keys = function keep_keys(obj, keys) {
   return Object.keys(obj).reduce(function (r, e) {
     if (keys.includes(e)) r[e] = obj[e];
@@ -185,8 +206,8 @@ var filter_falsey_vals = function filter_falsey_vals(obj) {
   }, {});
 };
 var zip = function zip(arr) {
-  for (var _len = arguments.length, arrs = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    arrs[_key - 1] = arguments[_key];
+  for (var _len = arguments.length, arrs = new Array(_len > 1 ? _len - 1 : 0), _key2 = 1; _key2 < _len; _key2++) {
+    arrs[_key2 - 1] = arguments[_key2];
   }
 
   return arr.map(function (val, i) {
@@ -359,48 +380,11 @@ function objinfo(obj) {
     obj_type: objtype(obj)
   };
 }
-
-var sort_keys_replacer = function sort_keys_replacer(_key, value) {
-  return value instanceof Object && !(value instanceof Array) ? Object.keys(value).sort().reduce(function (sorted, key) {
-    sorted[key] = value[key];
-    return sorted;
-  }, {}) : value;
-};
-var dumps = function dumps(data, opts) {
-  if (opts === void 0) {
-    opts = {};
-  }
-
-  var _opts = opts,
-      _opts$sort_keys = _opts.sort_keys,
-      sort_keys = _opts$sort_keys === void 0 ? false : _opts$sort_keys,
-      _opts$indent = _opts.indent,
-      indent = _opts$indent === void 0 ? undefined : _opts$indent;
-  var replacer = sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
-  return JSON.stringify(data, // @ts-ignore
-  replacer, indent);
-};
-
-var camel2snake = function camel2snake(str) {
-  return str[0].toLowerCase() + str.slice(1, str.length).replace(/[A-Z]/g, function (letter) {
-    return "_" + letter.toLowerCase();
-  });
-};
-var pascal2camel = function pascal2camel(str) {
-  return str[0].toLowerCase() + str.slice(1, str.length);
-};
-var snake2camel = function snake2camel(str) {
-  return str.toLowerCase().replace(/([-_][a-z])/g, function (group) {
-    return group.toUpperCase().replace('-', '').replace('_', '');
-  });
-};
-
 var hasArrayBuffer = typeof ArrayBuffer === 'function';
 var haskey = function haskey(obj, key) {
   var keyParts = key.split('.');
   return !!obj && (keyParts.length > 1 ? haskey(obj[key.split('.')[0]], keyParts.slice(1).join('.')) : Object.hasOwnProperty.call(obj, key));
 };
-
 var isnan = function isnan(num) {
   return Number.isNaN(Number(num));
 };
@@ -419,7 +403,25 @@ var isfloat = function isfloat(num) {
 var isempty = function isempty(obj) {
   return [Object, Array].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 };
+var toString = Object.prototype.toString;
+function isArrayBuffer(obj) {
+  return hasArrayBuffer && (obj instanceof ArrayBuffer || toString.call(obj) === '[object ArrayBuffer]');
+}
+var camel2snake = function camel2snake(str) {
+  return str[0].toLowerCase() + str.slice(1, str.length).replace(/[A-Z]/g, function (letter) {
+    return "_" + letter.toLowerCase();
+  });
+};
+var pascal2camel = function pascal2camel(str) {
+  return str[0].toLowerCase() + str.slice(1, str.length);
+};
+var snake2camel = function snake2camel(str) {
+  return str.toLowerCase().replace(/([-_][a-z])/g, function (group) {
+    return group.toUpperCase().replace('-', '').replace('_', '');
+  });
+};
 
+exports.__version__ = __version__;
 exports.arange = arange;
 exports.arrmax = arrmax;
 exports.arrmin = arrmin;
@@ -437,6 +439,7 @@ exports.get = get;
 exports.hasArrayBuffer = hasArrayBuffer;
 exports.haskey = haskey;
 exports.http = http;
+exports.isArrayBuffer = isArrayBuffer;
 exports.isempty = isempty;
 exports.isfin = isfin;
 exports.isfloat = isfloat;
