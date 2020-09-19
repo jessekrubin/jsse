@@ -1,4 +1,4 @@
-export declare const __version__ = "0.1.12";
+export declare const __version__ = "0.2.0";
 export declare function sleep(ms: number): Promise<unknown>;
 export declare const sort_keys_replacer: (_key: any, value: any) => any;
 export declare const dumps: (data: any, opts?: {

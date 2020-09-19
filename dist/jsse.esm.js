@@ -145,7 +145,7 @@ var filter_async = function filter_async(array, cb) {
     return Promise.reject(e);
   }
 };
-var __version__ = "0.1.12";
+var __version__ = "0.2.0";
 function sleep(ms) {
   return new Promise(function (resolve) {
     return setTimeout(resolve, ms);
