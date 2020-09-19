@@ -4,6 +4,8 @@
 * text eol=lf
 *.c text eol=lf
 *.gitattributes text eol=lf
+*.npmignore text eol=lf
+*.gitignore text eol=lf
 *.in text eol=lf
 *.cfg text eol=lf
 *.h text eol=lf
