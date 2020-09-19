@@ -1,42 +1,68 @@
+export const __version__ = "0.1.12";
+
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const sum = (a: number, b: number) => {
-  if ('development' === process.env.NODE_ENV) {
-    console.log('boop');
-  }
-  return a + b;
+export const sort_keys_replacer = (
+  _key: any,
+  value: { [x: string]: any } | any[] | any
+) =>
+  value instanceof Object && !(value instanceof Array)
+    ? Object.keys(value)
+    .sort()
+    .reduce((sorted: { [x: string]: any }, key: string) => {
+      sorted[key] = value[key];
+      return sorted;
+    }, {})
+    : value;
+
+export const dumps = (
+  data: any,
+  opts: {
+    sort_keys?: boolean;
+    indent?: number | undefined;
+  } = {}
+) => {
+  const { sort_keys = false, indent = undefined } = opts;
+  const replacer =
+    sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
+  return JSON.stringify(
+    data,
+    // @ts-ignore
+    replacer,
+    indent
+  );
 };
 export const keep_keys = (obj: Record<any, any>, keys: string[]) => {
-  return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
+  return Object.keys(obj).reduce(function(r: Record<any, any>, e) {
     if (keys.includes(e)) r[e] = obj[e];
     return r;
   }, {});
 };
 export const keep_vals = (obj: Record<any, any>, vals: any[]) => {
-  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
     if (vals.includes(obj[e])) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_keys = (obj: Record<any, any>, keys: string[]) => {
-  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
     if (!keys.includes(e)) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_vals = (obj: Record<any, any>, vals: any[]) => {
-  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
     if (!vals.includes(obj[e])) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_falsey_vals = (obj: Record<any, any>) => {
-  return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
+  return Object.keys(obj).reduce(function(r: Record<any, any>, e) {
     if (obj[e]) r[e] = obj[e];
     return r;
   }, {});
@@ -73,13 +99,13 @@ export const items = (obj: any) => {
 };
 
 export function arrmin<T>(arr: T[]): T {
-  return arr.reduce(function (p, v) {
+  return arr.reduce(function(p, v) {
     return p < v ? p : v;
   });
 }
 
 export function arrmax<T>(arr: T[]): T {
-  return arr.reduce(function (p, v) {
+  return arr.reduce(function(p, v) {
     return p > v ? p : v;
   });
 }
@@ -208,3 +234,64 @@ export function objinfo(obj: any) {
     obj_type: objtype(obj),
   };
 }
+
+export const hasArrayBuffer = typeof ArrayBuffer === 'function';
+
+export const haskey = function(obj: any, key: string): boolean {
+  const keyParts = key.split('.');
+
+  return !!obj && (
+    keyParts.length > 1
+      ? haskey(obj[key.split('.')[0]], keyParts.slice(1).join('.'))
+      : Object.hasOwnProperty.call(obj, key)
+  );
+};
+
+export const isnan = (num: string | number) => {
+  return Number.isNaN(Number(num));
+};
+export const isfin = (num: string | number) => {
+  return Number.isFinite(Number(num));
+};
+export const isinf = (num: string | number) => {
+  return !Number.isFinite(Number(num));
+};
+export const isint = (num: string | number) => {
+  return Number.isInteger(Number(num));
+};
+export const isfloat = (num: string | number) => {
+  return !isint(num);
+};
+export const isempty = (obj: any) => {
+  return (
+    [ Object, Array ].includes((obj || {}).constructor) &&
+    !Object.entries(obj || {}).length
+  );
+};
+
+const { toString } = Object.prototype;
+
+export function isArrayBuffer(obj: any) {
+  return hasArrayBuffer && (obj instanceof ArrayBuffer || toString.call(obj) === '[object ArrayBuffer]');
+}
+
+export const camel2snake = (str: string) => {
+  return (
+    str[0].toLowerCase() +
+    str
+      .slice(1, str.length)
+      .replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+  );
+};
+
+export const pascal2camel = (str: string) => {
+  return str[0].toLowerCase() + str.slice(1, str.length);
+};
+
+export const snake2camel = (str: string): string =>
+  str.toLowerCase().replace(/([-_][a-z])/g, (group) =>
+    group
+      .toUpperCase()
+      .replace('-', '')
+      .replace('_', '')
+  );

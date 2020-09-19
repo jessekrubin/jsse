@@ -1,30 +1,14 @@
 import {
+  __version__,
   arange,
   arrmax,
   arrmin,
   chunk,
-  // dirs_gen,
-  // dirs_list,
-  // files_gen,
-  // files_list,
-  ljson,
-  lstring,
-  pwd,
-  sjson,
-  sort_keys_replacer,
   nbytes,
-  sstring,
-  sum,
-  walk_gen,
-  walk_list,
   objinfo,
+  sort_keys_replacer,
 } from '../src';
 
-describe('sum', () => {
-  it('works', () => {
-    expect(sum(1, 1)).toEqual(2);
-  });
-});
 describe('arange', () => {
   it('one arg', () => {
     expect(arange(10)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -84,24 +68,6 @@ describe('size of object', () => {
   });
 });
 
-describe('fs-utils', () => {
-  it('STRING-IO TEST: sstring and lstring', async () => {
-    const stringy = 'this is a string\nand it has two lines';
-    const filepath = 'somefile.txt';
-    await sstring(filepath, stringy);
-    const loaded_stringy = await lstring(filepath);
-    return expect(loaded_stringy).toEqual(stringy);
-  });
-
-  it('JSON-IO TEST DICT: sjson and ljson', async () => {
-    const anobject = { one: 1, two: 2, three: 3 };
-    const filepath = 'somefile.json';
-    await sjson(filepath, anobject);
-    const loaded_stringy = await ljson(filepath);
-    return expect(loaded_stringy).toEqual(anobject);
-  });
-});
-
 describe('chunks', () => {
   it('chunk', () => {
     return expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
@@ -123,42 +89,9 @@ describe('stringify', () => {
     return expect(sorted_str).toEqual(exp);
   });
 });
-
-// console.log(JSON.stringify({
-//   c: 1,
-//   a: {d: 0, c: 1, e: {a: 0, 1: 4}},
-// }, sort_keys_replacer));
-
-describe('fs_gens', () => {
-  const tdirpath = pwd() + '/docs';
-
-  it('walk_gen and walk_list', async () => {
-    // let h = 0
-    let l = [];
-    for await (let el of await walk_gen(tdirpath)) {
-      // console.log(el);
-      l.push(el);
-      // h += 1
-    }
-    const wlist = await walk_list(tdirpath);
-    return expect(l.sort()).toEqual(wlist.sort());
+describe('version', () => {
+  it('sorted', async () => {
+    const pkg_json = require('../package.json');
+    expect(pkg_json.version).toEqual(__version__);
   });
-
-  // it('files_gen and files_list', async () => {
-  //   const l = [];
-  //   for await (let el of await files_gen(tdirpath)) {
-  //     l.push(el);
-  //   }
-  //   const flist = await files_list(tdirpath);
-  //   return expect(l.sort()).toEqual(flist.sort());
-  // });
-  //
-  // it('dirs_gen and dirs_list', async () => {
-  //   const l = [];
-  //   for await (let el of await dirs_gen(tdirpath)) {
-  //     l.push(el);
-  //   }
-  //   const dlist = await dirs_list(tdirpath);
-  //   return expect(l.sort()).toEqual(dlist.sort());
-  // });
 });

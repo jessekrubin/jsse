@@ -1,5 +1,4 @@
 export declare function sleep(ms: number): Promise<unknown>;
-export declare const sum: (a: number, b: number) => number;
 export declare const keep_keys: (obj: Record<any, any>, keys: string[]) => Record<any, any>;
 export declare const keep_vals: (obj: Record<any, any>, vals: any[]) => Record<string, any>;
 export declare const filter_keys: (obj: Record<any, any>, keys: string[]) => Record<string, any>;
