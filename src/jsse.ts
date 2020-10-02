@@ -1,4 +1,4 @@
-export const __version__ = "0.2.0";
+export const __version__ = '0.2.0';
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -10,11 +10,11 @@ export const sort_keys_replacer = (
 ) =>
   value instanceof Object && !(value instanceof Array)
     ? Object.keys(value)
-    .sort()
-    .reduce((sorted: { [x: string]: any }, key: string) => {
-      sorted[key] = value[key];
-      return sorted;
-    }, {})
+        .sort()
+        .reduce((sorted: { [x: string]: any }, key: string) => {
+          sorted[key] = value[key];
+          return sorted;
+        }, {})
     : value;
 
 export const dumps = (
@@ -25,8 +25,7 @@ export const dumps = (
   } = {}
 ) => {
   const { sort_keys = false, indent = undefined } = opts;
-  const replacer =
-    sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
+  const replacer = sort_keys && typeof data === 'object' ? sort_keys_replacer : null;
   return JSON.stringify(
     data,
     // @ts-ignore
@@ -69,7 +68,7 @@ export const filter_falsey_vals = (obj: Record<any, any>) => {
 };
 
 export const zip = (arr: any[], ...arrs: any[]) => {
-  return arr.map((val, i) => arrs.reduce((a, arr) => [ ...a, arr[i] ], [ val ]));
+  return arr.map((val, i) => arrs.reduce((a, arr) => [...a, arr[i]], [val]));
 };
 
 // array o objects + a key to grame from object => object/dict using given key
@@ -86,9 +85,9 @@ export const objectify = (arr: any[], key: string | number) => {
 export function arange(
   start: number,
   end: number | undefined = undefined,
-  step = 1,
+  step = 1
 ): number[] {
-  if (end === undefined) [ end, start ] = [ start, 0 ];
+  if (end === undefined) [end, start] = [start, 0];
   let l = [];
   for (let n = start; n < end; n += step) l.push(n);
   return l;
@@ -113,21 +112,21 @@ export function arrmax<T>(arr: T[]): T {
 export function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((arr: any[], item, idx: number) => {
     return idx % size === 0
-      ? [ ...arr, [ item ] ]
-      : [ ...arr.slice(0, -1), [ ...arr.slice(-1)[0], item ] ];
+      ? [...arr, [item]]
+      : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
   }, []);
 }
 
 export function map_async<T, U>(
   array: T[],
-  cb: (value: T, index: number, array: T[]) => Promise<U>,
+  cb: (value: T, index: number, array: T[]) => Promise<U>
 ): Promise<U[]> {
   return Promise.all(array.map(cb));
 }
 
 export async function filter_async<T>(
   array: T[],
-  cb: (value: T, index: number, array: T[]) => Promise<boolean>,
+  cb: (value: T, index: number, array: T[]) => Promise<boolean>
 ): Promise<T[]> {
   const filterMap = await map_async(array, cb);
   return array.filter((_value, index) => filterMap[index]);
@@ -169,7 +168,7 @@ export function fmt_nbytes(bytes: number) {
   else if (bytes < 1048576) return (bytes / 1024).toFixed(3) + ' KiB';
   else if (bytes < 1073741824) return (bytes / 1048576).toFixed(3) + ' MiB';
   else return (bytes / 1073741824).toFixed(3) + ' GiB';
-};
+}
 
 export function objtype(obj: any): string {
   if (obj === null) {
@@ -221,10 +220,10 @@ export function nbytes(obj: any): number {
       }
     }
     return bytes;
-  };
+  }
 
   return _nbytes(obj);
-};
+}
 
 export function objinfo(obj: any) {
   const size = nbytes(obj);
@@ -240,31 +239,37 @@ export const hasArrayBuffer = typeof ArrayBuffer === 'function';
 export const haskey = function(obj: any, key: string): boolean {
   const keyParts = key.split('.');
 
-  return !!obj && (
-    keyParts.length > 1
+  return (
+    !!obj &&
+    (keyParts.length > 1
       ? haskey(obj[key.split('.')[0]], keyParts.slice(1).join('.'))
-      : Object.hasOwnProperty.call(obj, key)
+      : Object.hasOwnProperty.call(obj, key))
   );
 };
 
 export const isnan = (num: string | number) => {
   return Number.isNaN(Number(num));
 };
+
 export const isfin = (num: string | number) => {
   return Number.isFinite(Number(num));
 };
+
 export const isinf = (num: string | number) => {
   return !Number.isFinite(Number(num));
 };
+
 export const isint = (num: string | number) => {
   return Number.isInteger(Number(num));
 };
+
 export const isfloat = (num: string | number) => {
   return !isint(num);
 };
+
 export const isempty = (obj: any) => {
   return (
-    [ Object, Array ].includes((obj || {}).constructor) &&
+    [Object, Array].includes((obj || {}).constructor) &&
     !Object.entries(obj || {}).length
   );
 };
@@ -272,15 +277,16 @@ export const isempty = (obj: any) => {
 const { toString } = Object.prototype;
 
 export function isArrayBuffer(obj: any) {
-  return hasArrayBuffer && (obj instanceof ArrayBuffer || toString.call(obj) === '[object ArrayBuffer]');
+  return (
+    hasArrayBuffer &&
+    (obj instanceof ArrayBuffer || toString.call(obj) === '[object ArrayBuffer]')
+  );
 }
 
 export const camel2snake = (str: string) => {
   return (
     str[0].toLowerCase() +
-    str
-      .slice(1, str.length)
-      .replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+    str.slice(1, str.length).replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
   );
 };
 
