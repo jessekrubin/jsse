@@ -277,6 +277,10 @@ export const isempty = (obj: any) => {
   );
 };
 
+export const dos2unix = (str: string) => {
+  return str.replace(/\r\n/g, '\n');
+};
+
 const { toString } = Object.prototype;
 
 export function isArrayBuffer(obj: any) {
