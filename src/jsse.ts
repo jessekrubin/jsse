@@ -1,4 +1,4 @@
-export const __version__ = '0.2.0';
+export const __version__ = '0.2.2';
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
