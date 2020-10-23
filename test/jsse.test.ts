@@ -12,40 +12,41 @@ import {
 
 describe('arange', () => {
   it('one arg', () => {
-    expect(arange(10)).toEqual([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]);
+    expect(arange(10)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
   it('2 args (start stop)', () => {
-    expect(arange(1, 10)).toEqual([ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]);
+    expect(arange(1, 10)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 });
 describe('arrmax arrmin', () => {
   it('arrmax numbers', async () => {
-    return expect(arrmax([ 1, 3, 45, 56 ])).toEqual(56);
+    return expect(arrmax([1, 3, 45, 56])).toEqual(56);
   });
   it('arrmax strings', async () => {
-    return expect(arrmax([ 'a', 'b', 'zebra' ])).toEqual('zebra');
+    return expect(arrmax(['a', 'b', 'zebra'])).toEqual('zebra');
   });
 
   it('arrmin numbers', async () => {
-    return expect(arrmin([ 1, 3, 45, 56 ])).toEqual(1);
+    return expect(arrmin([1, 3, 45, 56])).toEqual(1);
   });
 
   it('arrmin strings', async () => {
-    return expect(arrmin([ 'a', 'b', 'zebra' ])).toEqual('a');
+    return expect(arrmin(['a', 'b', 'zebra'])).toEqual('a');
   });
 });
 describe('arr flatten', () => {
   it('arr flatten basic', async () => {
-    return expect(arrflatten([ 1, 3, 45, 56 ])).toEqual(
-      [ 1, 3, 45, 56 ],
-    );
+    return expect(arrflatten([1, 3, 45, 56])).toEqual([1, 3, 45, 56]);
   });
   it('arr flatten nested', async () => {
-    return expect(arrflatten(
-      [ [ [ [ [ 0 ] ], [ 1 ] ], [ [ [ 2 ], [ 3 ] ] ], [ [ 4 ], [ 5 ] ] ] ],
-    )).toEqual(
-      [ 0, 1, 2, 3, 4, 5 ],
-    );
+    return expect(arrflatten([[[[[0]], [1]], [[[2], [3]]], [[4], [5]]]])).toEqual([
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+    ]);
   });
 });
 
@@ -65,7 +66,7 @@ describe('object info ArrayBuffer', () => {
   });
 });
 describe('object info', () => {
-  const { size, size_str, obj_type } = objinfo([ 'a', 'b', 'zebra' ]);
+  const { size, size_str, obj_type } = objinfo(['a', 'b', 'zebra']);
   it('objtype', async () => {
     return expect(obj_type).toEqual('Array');
   });
@@ -79,13 +80,13 @@ describe('object info', () => {
 });
 describe('size of object', () => {
   it('uno', async () => {
-    return expect(nbytes([ 'a', 'b', 'zebra' ])).toEqual(14);
+    return expect(nbytes(['a', 'b', 'zebra'])).toEqual(14);
   });
 });
 
 describe('chunks', () => {
   it('chunk', () => {
-    return expect(chunk([ 1, 2, 3, 4, 5 ], 2)).toEqual([ [ 1, 2 ], [ 3, 4 ], [ 5 ] ]);
+    return expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]]);
   });
 });
 describe('stringify', () => {
