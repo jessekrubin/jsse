@@ -34,34 +34,34 @@ export const dumps = (
   );
 };
 export const keep_keys = (obj: Record<any, any>, keys: string[]) => {
-  return Object.keys(obj).reduce(function(r: Record<any, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
     if (keys.includes(e)) r[e] = obj[e];
     return r;
   }, {});
 };
 export const keep_vals = (obj: Record<any, any>, vals: any[]) => {
-  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
     if (vals.includes(obj[e])) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_keys = (obj: Record<any, any>, keys: string[]) => {
-  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
     if (!keys.includes(e)) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_vals = (obj: Record<any, any>, vals: any[]) => {
-  return Object.keys(obj).reduce(function(r: Record<string, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<string, any>, e) {
     if (!vals.includes(obj[e])) r[e] = obj[e];
     return r;
   }, {});
 };
 
 export const filter_falsey_vals = (obj: Record<any, any>) => {
-  return Object.keys(obj).reduce(function(r: Record<any, any>, e) {
+  return Object.keys(obj).reduce(function (r: Record<any, any>, e) {
     if (obj[e]) r[e] = obj[e];
     return r;
   }, {});
@@ -98,16 +98,19 @@ export const items = (obj: any) => {
 };
 
 export function arrmin<T>(arr: T[]): T {
-  return arr.reduce(function(p, v) {
+  return arr.reduce(function (p, v) {
     return p < v ? p : v;
   });
 }
 
 export function arrmax<T>(arr: T[]): T {
-  return arr.reduce(function(p, v) {
+  return arr.reduce(function (p, v) {
     return p > v ? p : v;
   });
 }
+
+export const arrflatten = (arr: any[]): any[] =>
+  arr.reduce((a, b) => a.concat(Array.isArray(b) ? arrflatten(b) : b), []);
 
 export function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((arr: any[], item, idx: number) => {
@@ -236,7 +239,7 @@ export function objinfo(obj: any) {
 
 export const hasArrayBuffer = typeof ArrayBuffer === 'function';
 
-export const haskey = function(obj: any, key: string): boolean {
+export const haskey = function (obj: any, key: string): boolean {
   const keyParts = key.split('.');
 
   return (
@@ -295,9 +298,8 @@ export const pascal2camel = (str: string) => {
 };
 
 export const snake2camel = (str: string): string =>
-  str.toLowerCase().replace(/([-_][a-z])/g, (group) =>
-    group
-      .toUpperCase()
-      .replace('-', '')
-      .replace('_', '')
-  );
+  str
+    .toLowerCase()
+    .replace(/([-_][a-z])/g, (group) =>
+      group.toUpperCase().replace('-', '').replace('_', '')
+    );
